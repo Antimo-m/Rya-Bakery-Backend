@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderHistory;
+use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
+
+class OrderController extends Controller
+{
+    public function index(): View
+    {
+        Order::archiveDeliveredOrders();
+
+        return view('admin.orders.index', [
+            'title' => 'Rya Bakery Admin | Ordini',
+            'orders' => Order::active()->with('items.product')->latest()->paginate(15),
+        ]);
+    }
+
+    public function edit(Order $order): View
+    {
+        return view('admin.orders.form', [
+            'title' => 'Rya Bakery Admin | Modifica ordine',
+            'order' => $order->load('items.product'),
+            'products' => Product::where('is_active', true)->orderBy('name')->get(),
+            'statuses' => Order::STATUSES,
+        ]);
+    }
+
+    public function update(Request $request, Order $order): RedirectResponse
+    {
+        $data = $request->validate([
+            'customer_name' => ['required', 'string', 'max:80'],
+            'table_number' => ['required', 'integer', 'min:1', 'max:999'],
+            'status' => ['required', Rule::in(array_keys(Order::STATUSES))],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.product_slug' => ['nullable', 'string', 'exists:products,slug'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:0', 'max:50'],
+        ]);
+
+        $data['items'] = collect($data['items'])
+            ->filter(fn (array $item): bool => filled($item['product_slug'] ?? null) && (int) ($item['quantity'] ?? 0) > 0)
+            ->values()
+            ->all();
+
+        if ($data['items'] === []) {
+            return back()
+                ->withErrors(['items' => 'Un ordine deve contenere almeno un prodotto con quantita maggiore di zero.'])
+                ->withInput();
+        }
+
+        DB::transaction(function () use ($order, $data): void {
+            $order->update([
+                'customer_name' => $data['customer_name'],
+                'table_number' => $data['table_number'],
+                'status' => $data['status'],
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            $order->items()->delete();
+            $products = Product::whereIn('slug', collect($data['items'])->pluck('product_slug'))->get()->keyBy('slug');
+
+            foreach ($data['items'] as $item) {
+                $product = $products[$item['product_slug']];
+                $unitPrice = (float) $product->price;
+
+                $order->items()->create([
+                    'product_id' => $product->id,
+                    'quantity' => (int) $item['quantity'],
+                    'unit_price' => $unitPrice,
+                    'line_total' => $unitPrice * (int) $item['quantity'],
+                ]);
+            }
+
+            $order->recalculateTotal();
+        });
+
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine modificato correttamente.');
+    }
+
+    public function accept(Order $order): RedirectResponse
+    {
+        $order->update([
+            'status' => Order::STATUS_PENDING,
+            'accepted_at' => now(),
+        ]);
+
+        return back()->with('success', 'Ordine accettato.');
+    }
+
+    public function cancel(Order $order): RedirectResponse
+    {
+        DB::transaction(function () use ($order): void {
+            $order->update([
+                'status' => Order::STATUS_CANCELLED,
+                'cancelled_at' => now(),
+            ]);
+
+            $order->histories()->create([
+                'reason' => OrderHistory::REASON_CANCELLED,
+                'archived_at' => now(),
+                'restorable_until' => now()->addMinutes(30),
+            ]);
+        });
+
+        return redirect()->route('admin.order-history.index')->with('success', 'Ordine annullato e spostato nello storico.');
+    }
+
+    public function complete(Order $order): RedirectResponse
+    {
+        $order->update([
+            'status' => Order::STATUS_DELIVERED,
+            'delivered_at' => now(),
+        ]);
+
+        return back()->with('success', 'Ordine consegnato. Restera negli ordini attivi per 10 minuti.');
+    }
+
+    public function destroy(Order $order): RedirectResponse
+    {
+        $order->delete();
+
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine eliminato correttamente.');
+    }
+}

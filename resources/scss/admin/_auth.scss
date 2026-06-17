@@ -1,0 +1,39 @@
+.admin-login-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        linear-gradient(135deg, rgba(183, 95, 50, .16), transparent 38%),
+        linear-gradient(315deg, rgba(38, 116, 93, .12), transparent 35%),
+        var(--rya-bg);
+}
+
+.admin-login-brand {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    display: grid;
+    gap: 2px;
+
+    span {
+        font-size: 24px;
+        font-weight: 850;
+    }
+
+    small {
+        color: var(--rya-muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+}
+
+.admin-login-card {
+    width: min(100%, 430px);
+    padding: 30px;
+    border: 1px solid var(--rya-line);
+    border-radius: 8px;
+    background: rgba(255, 250, 245, .96);
+    box-shadow: 0 24px 70px rgba(63, 39, 24, .12);
+}

@@ -1,0 +1,13 @@
+.admin-body {
+    min-height: 100vh;
+    background: var(--rya-bg);
+    color: var(--rya-ink);
+}
+
+.admin-body * {
+    box-sizing: border-box;
+}
+
+.admin-body a {
+    color: inherit;
+}

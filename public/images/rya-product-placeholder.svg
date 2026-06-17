@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="Rya Bakery product">
+  <rect width="640" height="480" fill="#f4eadc"/>
+  <circle cx="470" cy="100" r="86" fill="#f0bc73"/>
+  <path d="M118 310c0-78 64-141 143-141h118c79 0 143 63 143 141v20H118z" fill="#c97844"/>
+  <path d="M170 309c17-49 61-83 112-83h78c51 0 95 34 112 83z" fill="#ffe2ae"/>
+  <path d="M209 255c35 25 72 25 107 0 35 25 72 25 107 0" fill="none" stroke="#8f4d31" stroke-width="22" stroke-linecap="round"/>
+  <text x="320" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#41261c">Rya Bakery</text>
+</svg>
