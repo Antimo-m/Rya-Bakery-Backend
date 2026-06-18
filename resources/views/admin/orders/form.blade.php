@@ -49,7 +49,7 @@
                             <option value="{{ $product->slug }}" @selected($item->product->is($product))>{{ $product->name }} · € {{ number_format($product->price, 2, ',', '.') }}</option>
                         @endforeach
                     </select>
-                    <input name="items[{{ $index }}][quantity]" type="number" min="0" max="50" value="{{ $item->quantity }}">
+                    <input name="items[{{ $index }}][quantity]" type="number" min="0" max="{{ \App\Models\Order::MAX_PRODUCT_QUANTITY }}" value="{{ $item->quantity }}">
                 </div>
             @endforeach
 
@@ -62,7 +62,7 @@
                             <option value="{{ $product->slug }}">{{ $product->name }} · € {{ number_format($product->price, 2, ',', '.') }}</option>
                         @endforeach
                     </select>
-                    <input name="items[{{ $index }}][quantity]" type="number" min="0" max="50" value="0">
+                    <input name="items[{{ $index }}][quantity]" type="number" min="0" max="{{ \App\Models\Order::MAX_PRODUCT_QUANTITY }}" value="0">
                 </div>
             @endfor
         </div>

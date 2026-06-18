@@ -21,7 +21,7 @@ class OrderController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_slug' => ['required', 'string', 'exists:products,slug'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:20'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:'.Order::MAX_PRODUCT_QUANTITY],
         ], [
             'customer_name.required' => 'Inserisci il nome cliente per inviare l ordine.',
             'table_number.required' => 'Inserisci il numero del tavolo.',

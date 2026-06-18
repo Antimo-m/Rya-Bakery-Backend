@@ -107,3 +107,37 @@
         font-weight: 800;
     }
 }
+
+.admin-filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) minmax(150px, .8fr) repeat(2, minmax(140px, .7fr)) auto auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid var(--rya-line);
+    border-radius: 18px;
+    background: var(--rya-panel-strong);
+    box-shadow: var(--rya-shadow);
+
+    label {
+        display: grid;
+        gap: 6px;
+        color: var(--rya-muted);
+        font-size: 12px;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+
+    input,
+    select {
+        min-height: 42px;
+        border: 1px solid var(--rya-line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: var(--rya-ink);
+        background: #fff;
+        font-size: 14px;
+        text-transform: none;
+    }
+}

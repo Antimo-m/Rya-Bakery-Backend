@@ -27,6 +27,7 @@ Route::middleware(['auth', 'verified'])->prefix('backend/admin')->name('admin.')
     Route::patch('orders/{order:slug}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::patch('orders/{order:slug}/complete', [OrderController::class, 'complete'])->name('orders.complete');
     Route::get('order-history', [OrderHistoryController::class, 'index'])->name('order-history.index');
+    Route::get('order-history/export', [OrderHistoryController::class, 'export'])->name('order-history.export');
     Route::patch('order-history/{order:slug}/restore', [OrderHistoryController::class, 'restore'])->name('order-history.restore');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

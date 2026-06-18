@@ -30,6 +30,26 @@ class RyaBakeryFlowTest extends TestCase
             ->assertJsonMissing(['id' => $product->id]);
     }
 
+    public function test_public_catalog_is_paginated_and_filterable(): void
+    {
+        Product::factory()->count(3)->create([
+            'category' => 'Dolci',
+            'is_active' => true,
+        ]);
+        Product::factory()->count(2)->create([
+            'category' => 'Salato',
+            'is_active' => true,
+        ]);
+
+        $this->getJson('/api/products?category=Dolci&per_page=2')
+            ->assertOk()
+            ->assertJsonCount(2, 'products')
+            ->assertJsonPath('meta.per_page', 2)
+            ->assertJsonPath('meta.total', 3)
+            ->assertJsonPath('categories.0', 'Dolci')
+            ->assertJsonPath('categories.1', 'Salato');
+    }
+
     public function test_frontend_can_create_order_using_product_slug(): void
     {
         $product = Product::factory()->create([
@@ -57,6 +77,23 @@ class RyaBakeryFlowTest extends TestCase
             'table_number' => 4,
             'status' => Order::STATUS_RECEIVED,
         ]);
+    }
+
+    public function test_public_order_rejects_more_than_20_units_per_product(): void
+    {
+        $product = Product::factory()->create([
+            'slug' => 'box-pasticceria',
+            'is_active' => true,
+            'is_available' => true,
+        ]);
+
+        $this->postJson('/api/orders', [
+            'customer_name' => 'Naomi',
+            'table_number' => 4,
+            'items' => [
+                ['product_slug' => $product->slug, 'quantity' => 21],
+            ],
+        ])->assertUnprocessable();
     }
 
     public function test_admin_can_view_received_orders(): void
@@ -183,6 +220,49 @@ class RyaBakeryFlowTest extends TestCase
             'reason' => OrderHistory::REASON_CANCELLED,
             'restored_at' => null,
         ]);
+    }
+
+    public function test_admin_cannot_complete_received_order_before_accepting_it(): void
+    {
+        $user = User::factory()->create();
+        $order = Order::create([
+            'slug' => 'ordine-non-accettato',
+            'customer_name' => 'Cliente Stato',
+            'table_number' => 5,
+            'status' => Order::STATUS_RECEIVED,
+            'total_price' => 2.20,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('admin.orders.complete', $order))
+            ->assertSessionHasErrors('order');
+
+        $this->assertSame(Order::STATUS_RECEIVED, $order->fresh()->status);
+        $this->assertNull($order->fresh()->delivered_at);
+    }
+
+    public function test_admin_order_update_rejects_more_than_20_units_per_product(): void
+    {
+        $user = User::factory()->create();
+        $product = Product::factory()->create(['slug' => 'toast-test']);
+        $order = Order::create([
+            'slug' => 'ordine-quantita-admin',
+            'customer_name' => 'Cliente Quantita',
+            'table_number' => 5,
+            'status' => Order::STATUS_RECEIVED,
+            'total_price' => 2.20,
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('admin.orders.update', $order), [
+                'customer_name' => 'Cliente Quantita',
+                'table_number' => 5,
+                'status' => Order::STATUS_RECEIVED,
+                'items' => [
+                    ['product_slug' => $product->slug, 'quantity' => 21],
+                ],
+            ])
+            ->assertSessionHasErrors('items.0.quantity');
     }
 
     public function test_admin_can_restore_cancelled_order_within_30_minutes(): void

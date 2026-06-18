@@ -18,12 +18,13 @@ class Order extends Model
     public const STATUS_PENDING = 'pending';
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_DELIVERED = 'delivered';
+    public const MAX_PRODUCT_QUANTITY = 20;
 
     public const STATUSES = [
         self::STATUS_RECEIVED => 'Ricevuto',
         self::STATUS_PENDING => 'In lavorazione',
         self::STATUS_CANCELLED => 'Annullato',
-        self::STATUS_DELIVERED => 'Consegnato',
+        self::STATUS_DELIVERED => 'Pronto / Completato',
     ];
 
     protected function casts(): array

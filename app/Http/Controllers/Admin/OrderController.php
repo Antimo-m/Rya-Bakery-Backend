@@ -43,7 +43,7 @@ class OrderController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_slug' => ['nullable', 'string', 'exists:products,slug'],
-            'items.*.quantity' => ['nullable', 'integer', 'min:0', 'max:50'],
+            'items.*.quantity' => ['nullable', 'integer', 'min:0', 'max:'.Order::MAX_PRODUCT_QUANTITY],
         ]);
 
         $data['items'] = collect($data['items'])
@@ -88,6 +88,10 @@ class OrderController extends Controller
 
     public function accept(Order $order): RedirectResponse
     {
+        if ($order->status !== Order::STATUS_RECEIVED) {
+            return back()->withErrors(['order' => 'Solo gli ordini ricevuti possono essere accettati.']);
+        }
+
         $order->update([
             'status' => Order::STATUS_PENDING,
             'accepted_at' => now(),
@@ -98,6 +102,10 @@ class OrderController extends Controller
 
     public function cancel(Order $order): RedirectResponse
     {
+        if (! in_array($order->status, [Order::STATUS_RECEIVED, Order::STATUS_PENDING], true)) {
+            return back()->withErrors(['order' => 'Questo ordine non puo essere annullato.']);
+        }
+
         DB::transaction(function () use ($order): void {
             $order->update([
                 'status' => Order::STATUS_CANCELLED,
@@ -116,6 +124,10 @@ class OrderController extends Controller
 
     public function complete(Order $order): RedirectResponse
     {
+        if ($order->status !== Order::STATUS_PENDING) {
+            return back()->withErrors(['order' => 'Accetta l ordine prima di completarlo.']);
+        }
+
         $order->update([
             'status' => Order::STATUS_DELIVERED,
             'delivered_at' => now(),

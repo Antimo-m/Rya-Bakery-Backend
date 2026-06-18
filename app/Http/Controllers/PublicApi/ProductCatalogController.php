@@ -5,17 +5,24 @@ namespace App\Http\Controllers\PublicApi;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductCatalogController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::query()
+        $perPage = max(1, min((int) $request->integer('per_page', 12), 30));
+
+        $query = Product::query()
             ->where('is_active', true)
+            ->when($request->filled('category'), fn ($query) => $query->where('category', (string) $request->string('category')))
             ->orderBy('category')
-            ->orderBy('name')
-            ->get()
-            ->map(fn (Product $product): array => [
+            ->orderBy('name');
+
+        $products = $query->paginate($perPage)->withQueryString();
+
+        return response()->json([
+            'products' => $products->getCollection()->map(fn (Product $product): array => [
                 'name' => $product->name,
                 'slug' => $product->slug,
                 'category' => $product->category,
@@ -23,11 +30,20 @@ class ProductCatalogController extends Controller
                 'price' => (float) $product->price,
                 'image_url' => $product->image_url,
                 'is_available' => $product->is_available,
-            ]);
-
-        return response()->json([
-            'products' => $products,
-            'categories' => $products->pluck('category')->filter()->unique()->values(),
+            ]),
+            'categories' => Product::query()
+                ->where('is_active', true)
+                ->whereNotNull('category')
+                ->distinct()
+                ->orderBy('category')
+                ->pluck('category')
+                ->values(),
+            'meta' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+            ],
         ]);
     }
 

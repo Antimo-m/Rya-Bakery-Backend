@@ -43,15 +43,15 @@
                                     </form>
                                 @endif
 
-                                @if (in_array($order->status, [\App\Models\Order::STATUS_RECEIVED, \App\Models\Order::STATUS_PENDING], true))
+                                @if ($order->status === \App\Models\Order::STATUS_PENDING)
                                     <form method="POST" action="{{ route('admin.orders.complete', $order) }}" data-confirm="Confermare la consegna di questo ordine?">
                                         @csrf
                                         @method('PATCH')
-                                        <button class="admin-btn success" type="submit" title="Completa ordine">✓ Completa</button>
+                                        <button class="admin-btn success" type="submit" title="Completa ordine">✓ Completato</button>
                                     </form>
                                 @endif
 
-                                @if ($order->status !== \App\Models\Order::STATUS_DELIVERED)
+                                @if (in_array($order->status, [\App\Models\Order::STATUS_RECEIVED, \App\Models\Order::STATUS_PENDING], true))
                                     <form method="POST" action="{{ route('admin.orders.cancel', $order) }}" data-confirm="Annullare o rifiutare questo ordine? Sara spostato nello storico.">
                                         @csrf
                                         @method('PATCH')

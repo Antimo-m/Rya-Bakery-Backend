@@ -4,7 +4,33 @@
             <span class="admin-kicker">Archivio operativo</span>
             <h1>Storico ordini</h1>
         </div>
+        <a class="admin-btn secondary" href="{{ route('admin.order-history.export', request()->query()) }}">Esporta CSV</a>
     </x-slot>
+
+    <form class="admin-filters" method="GET" action="{{ route('admin.order-history.index') }}">
+        <label>
+            Cerca
+            <input name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cliente, tavolo o codice ordine">
+        </label>
+        <label>
+            Motivo
+            <select name="reason">
+                <option value="">Tutti</option>
+                <option value="{{ \App\Models\OrderHistory::REASON_CANCELLED }}" @selected(($filters['reason'] ?? '') === \App\Models\OrderHistory::REASON_CANCELLED)>Annullati</option>
+                <option value="{{ \App\Models\OrderHistory::REASON_DELIVERED }}" @selected(($filters['reason'] ?? '') === \App\Models\OrderHistory::REASON_DELIVERED)>Completati</option>
+            </select>
+        </label>
+        <label>
+            Da
+            <input name="from" type="date" value="{{ $filters['from'] ?? '' }}">
+        </label>
+        <label>
+            A
+            <input name="to" type="date" value="{{ $filters['to'] ?? '' }}">
+        </label>
+        <button class="admin-btn" type="submit">Filtra</button>
+        <a class="admin-btn secondary" href="{{ route('admin.order-history.index') }}">Reset</a>
+    </form>
 
     <section class="admin-table-wrap">
         <table class="admin-table">
