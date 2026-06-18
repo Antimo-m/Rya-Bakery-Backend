@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="none" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Rya Bakery logo</title>
+  <rect width="128" height="128" fill="#fff8f0" rx="64"/>
+  <path fill="#b75f32" d="M24 78c0-22.091 17.909-40 40-40s40 17.909 40 40v3H24v-3Z"/>
+  <path fill="#f0bc73" d="M34 73c2.604-13.703 14.643-24 29-24 14.359 0 26.397 10.297 29 24H34Z"/>
+  <path stroke="#fff8f0" stroke-linecap="round" stroke-width="7" d="M47 63c3-5 8.667-8 17-9m13 9c-2.333-4-6-6.667-11-8"/>
+  <path fill="#2b1d19" d="M31 93h66c-3.227 8.095-12.93 15-33 15s-29.773-6.905-33-15Z"/>
+  <path fill="#fff8f0" d="M44.5 90h39a4.5 4.5 0 0 1 0 9h-39a4.5 4.5 0 0 1 0-9Z"/>
+</svg>

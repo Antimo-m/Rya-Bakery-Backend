@@ -1,6 +1,6 @@
-<x-app-layout title="Rya Bakery Admin | Profilo utente">
+<x-app-layout title="Rya Bakery Admin | Impostazioni">
     <x-slot name="header">
-        <h1>Profilo utente</h1>
+        <h1>Impostazioni</h1>
     </x-slot>
 
     <div class="admin-grid">

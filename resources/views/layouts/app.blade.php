@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ $title ?? 'Rya Bakery Admin' }}</title>
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -21,12 +22,13 @@
                     <span class="admin-brand-mark">R</span>
                     <span>
                         <strong>Rya Bakery</strong>
-                        <small>Backoffice ordini</small>
+                        <small>Gestionale ordini</small>
                     </span>
                 </a>
 
                 <nav class="admin-nav" aria-label="Navigazione admin">
                     <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon> Dashboard</a>
+                    <a class="{{ request()->routeIs('admin.analysis.*') ? 'active' : '' }}" href="{{ route('admin.analysis.index') }}"><iconify-icon icon="solar:graph-new-up-bold-duotone"></iconify-icon> Analisi</a>
                     <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><iconify-icon icon="solar:donut-bitten-bold-duotone"></iconify-icon> Prodotti</a>
                     <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini</a>
                     <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><iconify-icon icon="solar:archive-bold-duotone"></iconify-icon> Storico ordini</a>
@@ -39,8 +41,7 @@
                             <small>{{ auth()->user()->email }}</small>
                         </summary>
                         <div class="admin-user-menu">
-                            <a href="{{ route('admin.profile.edit') }}">Profilo utente</a>
-                            <a href="{{ route('admin.profile.edit') }}">Impostazioni</a>
+                            <a href="{{ route('admin.settings.edit') }}">Impostazioni</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit">Logout</button>

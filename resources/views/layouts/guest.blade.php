@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ $title ?? 'Rya Bakery Admin | Login' }}</title>
+        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,7 +19,7 @@
         <div class="admin-login-screen">
             <div class="admin-login-brand">
                 <span>Rya Bakery</span>
-                <small>Backoffice</small>
+                <small>Gestionale</small>
             </div>
 
             <div class="admin-login-card">

@@ -126,6 +126,54 @@ class RyaBakeryFlowTest extends TestCase
             ->assertSee('Cornetto');
     }
 
+    public function test_admin_routes_do_not_expose_backend_admin_prefix(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/dashboard')
+            ->assertOk();
+
+        $this->actingAs($user)
+            ->get('/backend/admin')
+            ->assertRedirect('/dashboard');
+    }
+
+    public function test_admin_analysis_shows_completed_revenue_for_selected_day(): void
+    {
+        $user = User::factory()->create();
+        $deliveredAt = now()->setDate(2026, 6, 10)->setTime(12, 30);
+
+        Order::create([
+            'slug' => 'ordine-analisi',
+            'customer_name' => 'Cliente Analisi',
+            'table_number' => 2,
+            'status' => Order::STATUS_DELIVERED,
+            'total_price' => 12.50,
+            'delivered_at' => $deliveredAt,
+        ]);
+
+        Order::create([
+            'slug' => 'ordine-non-contato',
+            'customer_name' => 'Cliente Attesa',
+            'table_number' => 3,
+            'status' => Order::STATUS_RECEIVED,
+            'total_price' => 99.00,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.analysis.index', ['day' => '2026-06-10', 'month' => '2026-06']))
+            ->assertOk()
+            ->assertSee('€ 12,50')
+            ->assertSee('Cliente Analisi')
+            ->assertDontSee('€ 99,00');
+    }
+
+    public function test_application_uses_italy_timezone(): void
+    {
+        $this->assertSame('Europe/Rome', config('app.timezone'));
+    }
+
     public function test_admin_can_manage_products_with_slugs(): void
     {
         $user = User::factory()->create();

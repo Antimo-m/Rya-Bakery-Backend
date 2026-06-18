@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AnalysisController;
 use App\Http\Controllers\Admin\OrderHistoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -12,15 +13,13 @@ Route::get('/', fn() => redirect()->route('login'));
 
 Route::get('/login', fn () => view('auth.login', [
     'title' => 'Rya Bakery Admin | Login',
-]));
+]))->name('login');
 
-Route::get('/backend/admin', fn () => Auth::check()
-    ? redirect()->route('admin.dashboard')
-    : view('auth.login', ['title' => 'Rya Bakery Admin | Login'])
-)->name('login');
+Route::redirect('/backend/admin', '/dashboard');
 
-Route::middleware(['auth', 'verified'])->prefix('backend/admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified'])->name('admin.')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/analysis', AnalysisController::class)->name('analysis.index');
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('orders', OrderController::class)->except(['create', 'store', 'show']);
     Route::patch('orders/{order:slug}/accept', [OrderController::class, 'accept'])->name('orders.accept');
@@ -30,19 +29,11 @@ Route::middleware(['auth', 'verified'])->prefix('backend/admin')->name('admin.')
     Route::get('order-history/export', [OrderHistoryController::class, 'export'])->name('order-history.export');
     Route::patch('order-history/{order:slug}/restore', [OrderHistoryController::class, 'restore'])->name('order-history.restore');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/settings', [ProfileController::class, 'edit'])->name('settings.edit');
+    Route::patch('/settings', [ProfileController::class, 'update'])->name('settings.update');
+    Route::delete('/settings', [ProfileController::class, 'destroy'])->name('settings.destroy');
 });
 
-Route::get('/dashboard', fn () => redirect()->route('admin.dashboard'))
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+Route::redirect('/profile', '/settings');
 
 require __DIR__.'/auth.php';
