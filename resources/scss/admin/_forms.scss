@@ -363,4 +363,20 @@
         font-size: 14px;
         text-transform: none;
     }
+
+    input[type="date"],
+    input[type="month"] {
+        color-scheme: light;
+        cursor: pointer;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="month"]::-webkit-calendar-picker-indicator {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        padding: 4px;
+        background-color: #fff3e3;
+        cursor: pointer;
+    }
 }

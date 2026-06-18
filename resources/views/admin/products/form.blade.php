@@ -19,12 +19,16 @@
 
             <div class="field">
                 <label for="category">Categoria</label>
-                <input id="category" name="category" list="categories" value="{{ old('category', $product->category) }}">
-                <datalist id="categories">
+                @php $selectedCategory = old('category', $product->category); @endphp
+                <select id="category" name="category" data-custom-select>
+                    <option value="">Senza categoria</option>
+                    @if ($selectedCategory && ! in_array($selectedCategory, $categories, true))
+                        <option value="{{ $selectedCategory }}" selected>{{ $selectedCategory }}</option>
+                    @endif
                     @foreach ($categories as $category)
-                        <option value="{{ $category }}"></option>
+                        <option value="{{ $category }}" @selected($selectedCategory === $category)>{{ $category }}</option>
                     @endforeach
-                </datalist>
+                </select>
             </div>
 
             <div class="field price-field">
