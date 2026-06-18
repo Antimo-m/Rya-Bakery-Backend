@@ -28,7 +28,7 @@
 .admin-table-wrap,
 .admin-form {
     border: 1px solid var(--rya-line);
-    border-radius: 18px;
+    border-radius: var(--rya-radius-xl);
     background: var(--rya-panel-strong);
     box-shadow: var(--rya-shadow);
 }
@@ -85,7 +85,7 @@
     min-height: 38px;
     padding: 9px 14px;
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: var(--rya-radius-md);
     background: var(--rya-accent);
     color: #fff;
     font-weight: 850;

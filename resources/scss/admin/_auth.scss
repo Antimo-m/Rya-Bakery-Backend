@@ -4,17 +4,20 @@
     place-items: center;
     padding: 24px;
     background:
-        linear-gradient(135deg, rgba(183, 95, 50, .16), transparent 38%),
-        linear-gradient(315deg, rgba(38, 116, 93, .12), transparent 35%),
+        radial-gradient(circle at 50% 12%, rgba(239, 189, 115, .20), transparent 28%),
+        linear-gradient(135deg, rgba(183, 95, 50, .14), transparent 38%),
+        linear-gradient(315deg, rgba(17, 112, 92, .12), transparent 35%),
         var(--rya-bg);
 }
 
 .admin-login-brand {
     position: fixed;
     top: 28px;
-    left: 28px;
+    left: 50%;
     display: grid;
     gap: 2px;
+    text-align: center;
+    transform: translateX(-50%);
 
     span {
         font-size: 24px;
@@ -31,9 +34,66 @@
 
 .admin-login-card {
     width: min(100%, 430px);
-    padding: 30px;
+    padding: 34px;
     border: 1px solid var(--rya-line);
-    border-radius: 8px;
+    border-radius: var(--rya-radius-xl);
     background: rgba(255, 250, 245, .96);
     box-shadow: 0 24px 70px rgba(63, 39, 24, .12);
+}
+
+.admin-login-intro {
+    display: grid;
+    gap: 7px;
+    margin-bottom: 26px;
+    text-align: center;
+
+    span {
+        color: var(--rya-accent);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1;
+    }
+
+    p {
+        max-width: 310px;
+        margin: 0 auto;
+        color: var(--rya-muted);
+    }
+}
+
+.admin-login-form {
+    display: grid;
+    gap: 16px;
+}
+
+.admin-login-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--rya-muted);
+    font-weight: 750;
+
+    input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--rya-green);
+    }
+}
+
+.admin-login-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    a {
+        color: var(--rya-muted);
+        font-weight: 800;
+    }
 }

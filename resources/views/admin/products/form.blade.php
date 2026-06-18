@@ -27,17 +27,26 @@
                 </datalist>
             </div>
 
-            <div class="field">
+            <div class="field price-field">
                 <label for="price">Prezzo</label>
                 <input id="price" name="price" type="number" min="0.1" step="0.01" value="{{ old('price', $product->price) }}" required>
                 <x-input-error :messages="$errors->get('price')" />
             </div>
 
-            <div class="field">
+            <div class="field upload-field">
                 <label for="image">Immagine</label>
-                <input id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+                <label class="upload-zone" data-upload-zone for="image">
+                    <input id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
+                    <span class="upload-zone__icon"><iconify-icon icon="solar:gallery-add-bold-duotone"></iconify-icon></span>
+                    <span class="upload-zone__copy">
+                        <strong>Trascina una foto o tocca per scegliere</strong>
+                        <small data-upload-file-name>PNG, JPG o WebP fino a 2 MB</small>
+                    </span>
+                    <span class="upload-zone__preview">
+                        <img data-image-preview src="{{ $product->image_url }}" alt="">
+                    </span>
+                </label>
                 <div class="image-preview">
-                    <img data-image-preview src="{{ $product->image_url }}" alt="">
                     <span>{{ $product->image_path ? 'Anteprima immagine prodotto' : 'Placeholder prodotto' }}</span>
                 </div>
                 @if ($product->image_path)
@@ -52,9 +61,19 @@
             <textarea id="description" name="description" rows="4">{{ old('description', $product->description) }}</textarea>
         </div>
 
-        <div class="check-row">
-            <label><input type="checkbox" name="is_available" value="1" @checked(old('is_available', $product->is_available))> Disponibile</label>
-            <label><input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active))> Attivo</label>
+        <div class="toggle-grid">
+            <label class="switch-control">
+                <input type="checkbox" name="is_available" value="1" @checked(old('is_available', $product->is_available))>
+                <span aria-hidden="true"></span>
+                <strong>Disponibile</strong>
+                <small data-on="Disponibile" data-off="Non disponibile"></small>
+            </label>
+            <label class="switch-control">
+                <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $product->is_active))>
+                <span aria-hidden="true"></span>
+                <strong>Attivo</strong>
+                <small data-on="Attivo" data-off="Disattivato"></small>
+            </label>
         </div>
 
         <div class="admin-actions">

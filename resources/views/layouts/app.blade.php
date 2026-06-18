@@ -26,10 +26,10 @@
                 </a>
 
                 <nav class="admin-nav" aria-label="Navigazione admin">
-                    <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><span>⌂</span> Dashboard</a>
-                    <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><span>◧</span> Prodotti</a>
-                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><span>◌</span> Ordini</a>
-                    <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><span>↺</span> Storico ordini</a>
+                    <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon> Dashboard</a>
+                    <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><iconify-icon icon="solar:donut-bitten-bold-duotone"></iconify-icon> Prodotti</a>
+                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini</a>
+                    <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><iconify-icon icon="solar:archive-bold-duotone"></iconify-icon> Storico ordini</a>
                 </nav>
 
                 <div class="admin-user">

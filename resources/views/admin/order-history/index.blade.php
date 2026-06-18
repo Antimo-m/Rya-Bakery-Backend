@@ -14,7 +14,7 @@
         </label>
         <label>
             Motivo
-            <select name="reason">
+            <select name="reason" data-custom-select>
                 <option value="">Tutti</option>
                 <option value="{{ \App\Models\OrderHistory::REASON_CANCELLED }}" @selected(($filters['reason'] ?? '') === \App\Models\OrderHistory::REASON_CANCELLED)>Annullati</option>
                 <option value="{{ \App\Models\OrderHistory::REASON_DELIVERED }}" @selected(($filters['reason'] ?? '') === \App\Models\OrderHistory::REASON_DELIVERED)>Completati</option>

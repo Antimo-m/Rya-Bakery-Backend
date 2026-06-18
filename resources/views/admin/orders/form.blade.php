@@ -19,7 +19,7 @@
             </div>
             <div class="field">
                 <label for="status">Stato</label>
-                <select id="status" name="status">
+                <select id="status" name="status" data-custom-select>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}" @selected(old('status', $order->status) === $value)>{{ $label }}</option>
                     @endforeach
@@ -44,7 +44,7 @@
 
             @foreach ($rows as $index => $item)
                 <div class="order-item-row">
-                    <select name="items[{{ $index }}][product_slug]">
+                    <select name="items[{{ $index }}][product_slug]" data-custom-select>
                         @foreach ($products as $product)
                             <option value="{{ $product->slug }}" @selected($item->product->is($product))>{{ $product->name }} · € {{ number_format($product->price, 2, ',', '.') }}</option>
                         @endforeach
@@ -56,7 +56,7 @@
             @for ($i = 0; $i < $extraRows; $i++)
                 @php $index = $rows->count() + $i; @endphp
                 <div class="order-item-row">
-                    <select name="items[{{ $index }}][product_slug]">
+                    <select name="items[{{ $index }}][product_slug]" data-custom-select>
                         <option value="">Aggiungi prodotto</option>
                         @foreach ($products as $product)
                             <option value="{{ $product->slug }}">{{ $product->name }} · € {{ number_format($product->price, 2, ',', '.') }}</option>

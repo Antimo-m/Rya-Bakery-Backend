@@ -1,6 +1,8 @@
 .admin-body {
     min-height: 100vh;
-    background: var(--rya-bg);
+    background:
+        radial-gradient(circle at 16% 0%, rgba(239, 189, 115, .16), transparent 30%),
+        linear-gradient(180deg, #fbf8f3 0%, var(--rya-bg) 48%, #eee5da 100%);
     color: var(--rya-ink);
 }
 
@@ -10,4 +12,11 @@
 
 .admin-body a {
     color: inherit;
+}
+
+.admin-body button,
+.admin-body input,
+.admin-body select,
+.admin-body textarea {
+    font: inherit;
 }

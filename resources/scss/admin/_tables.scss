@@ -1,5 +1,6 @@
 .admin-table-wrap {
     overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -15,7 +16,10 @@
     }
 
     th {
-        background: #fff7ee;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #fff8ef;
         color: var(--rya-muted);
         font-size: 12px;
         font-weight: 850;
