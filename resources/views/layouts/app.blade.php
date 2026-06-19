@@ -10,7 +10,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800|fraunces:600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/scss/admin.scss', 'resources/js/app.js'])
@@ -18,7 +18,10 @@
     <body class="font-sans antialiased admin-body">
         <div class="admin-shell">
             <header class="admin-mobile-bar">
-                <a class="admin-mobile-brand" href="{{ route('admin.dashboard') }}">Rya Bakery & Café</a>
+                <a class="admin-mobile-brand" href="{{ route('admin.dashboard') }}">
+                    <img src="{{ asset('RyaBakery.png') }}" alt="">
+                    <span>Rya Bakery & Café</span>
+                </a>
                 <button class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Apri menu" title="Apri menu" data-admin-menu-toggle>
                     <iconify-icon icon="solar:hamburger-menu-linear"></iconify-icon>
                 </button>
@@ -26,7 +29,9 @@
             <button class="admin-sidebar-backdrop" type="button" aria-label="Chiudi menu" data-admin-menu-close></button>
             <aside class="admin-sidebar" id="admin-sidebar">
                 <a class="admin-brand" href="{{ route('admin.dashboard') }}">
-                    <span class="admin-brand-mark">R</span>
+                    <span class="admin-brand-mark">
+                        <img src="{{ asset('RyaBakery.png') }}" alt="">
+                    </span>
                     <span>
                         <strong>Rya Bakery</strong>
                         <small>Gestionale ordini</small>

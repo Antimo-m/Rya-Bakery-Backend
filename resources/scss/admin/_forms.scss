@@ -333,21 +333,21 @@
 
 .admin-filters {
     display: grid;
-    grid-template-columns: minmax(220px, 1.4fr) minmax(150px, .8fr) repeat(2, minmax(140px, .7fr)) auto auto;
-    gap: 12px;
+    grid-template-columns: minmax(190px, 1.2fr) minmax(132px, .72fr) repeat(2, minmax(126px, .62fr)) auto auto;
+    gap: 9px;
     align-items: end;
-    margin-bottom: 18px;
-    padding: 16px;
+    margin-bottom: 14px;
+    padding: 10px;
     border: 1px solid var(--rya-line);
-    border-radius: 18px;
-    background: var(--rya-panel-strong);
-    box-shadow: var(--rya-shadow);
+    border-radius: 16px;
+    background: rgba(255, 250, 244, .92);
+    box-shadow: var(--rya-shadow-soft);
 
     label {
         display: grid;
-        gap: 6px;
+        gap: 4px;
         color: var(--rya-muted);
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 850;
         text-transform: uppercase;
     }
@@ -356,18 +356,20 @@
     select {
         width: 100%;
         min-width: 0;
-        min-height: 42px;
+        min-height: 38px;
         border: 1px solid var(--rya-line);
-        border-radius: 12px;
-        padding: 10px 12px;
+        border-radius: 11px;
+        padding: 8px 10px;
         color: var(--rya-ink);
         background: #fff;
-        font-size: 14px;
+        font-size: 13px;
         text-transform: none;
     }
 
     .admin-btn {
+        min-height: 38px;
         min-width: 0;
+        padding: 8px 12px;
         white-space: nowrap;
     }
 }
@@ -375,8 +377,8 @@
 .admin-filters--compact {
     width: fit-content;
     max-width: 100%;
-    grid-template-columns: minmax(190px, 240px) auto auto;
-    padding: 12px;
+    grid-template-columns: minmax(170px, 220px) auto auto;
+    padding: 9px;
     border-radius: 16px;
     box-shadow: 0 12px 28px rgba(37, 25, 23, .07);
 }
@@ -388,9 +390,9 @@
 .custom-date-field {
     position: relative;
     display: grid;
-    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-columns: 30px minmax(0, 1fr);
     align-items: center;
-    min-height: 42px;
+    min-height: 38px;
     border: 1px solid var(--rya-line);
     border-radius: 12px;
     background: #fff;
@@ -399,14 +401,14 @@
     iconify-icon {
         justify-self: center;
         color: var(--rya-accent);
-        font-size: 18px;
+        font-size: 17px;
     }
 
     input {
-        min-height: 40px;
+        min-height: 36px;
         border: 0;
         border-radius: 0 12px 12px 0;
-        padding: 0 12px 0 4px;
+        padding: 0 10px 0 4px;
         background: transparent;
         cursor: pointer;
 

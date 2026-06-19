@@ -61,14 +61,7 @@
                             <small>Tavolo {{ $history->order->table_number }} · {{ $history->order->slug }}</small>
                         </td>
                         <td>
-                            <div class="admin-product-stack">
-                            @foreach ($history->order->items as $item)
-                                <span class="admin-product-chip">
-                                    <img src="{{ $item->product->image_url }}" alt="">
-                                    <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                </span>
-                            @endforeach
-                            </div>
+                            <x-admin.order-products :items="$history->order->items" />
                         </td>
                         <td><span class="badge {{ $history->reason }}">{{ $history->reasonLabel() }}</span></td>
                         <td>

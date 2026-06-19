@@ -123,7 +123,9 @@ class RyaBakeryFlowTest extends TestCase
             ->get(route('admin.orders.index'))
             ->assertOk()
             ->assertSee('Cliente Test')
-            ->assertSee('Tavolo 7')
+            ->assertSee('Tavolo')
+            ->assertSee('ordine-test')
+            ->assertSee('>7<', false)
             ->assertSee('Cornetto');
     }
 

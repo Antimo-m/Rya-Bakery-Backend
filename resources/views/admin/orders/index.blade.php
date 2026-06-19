@@ -21,10 +21,12 @@
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th>Nome</th>
                     <th>Ordine</th>
+                    <th>Tavolo</th>
                     <th>Prodotti</th>
-                    <th>Totale</th>
                     <th>Stato</th>
+                    <th>Totale</th>
                     <th>Data</th>
                     <th>Azioni</th>
                 </tr>
@@ -33,42 +35,15 @@
                 @forelse ($orders as $order)
                     <tr data-order-id="{{ $order->id }}">
                         <td>
-                            <strong>{{ $order->customer_name }}</strong><br>
-                            <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
+                            <strong>{{ $order->customer_name }}</strong>
                         </td>
+                        <td><small>{{ $order->slug }}</small></td>
+                        <td>{{ $order->table_number }}</td>
                         <td>
-                            <div class="admin-product-stack" data-order-products>
-                                @php
-                                    $orderItems = $order->items;
-                                    $hasManyProducts = $orderItems->count() > 4;
-                                @endphp
-
-                                @foreach ($hasManyProducts ? $orderItems->take(1) : $orderItems as $item)
-                                    <span class="admin-product-chip">
-                                        <img src="{{ $item->product->image_url }}" alt="">
-                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                    </span>
-                                @endforeach
-
-                                @if ($hasManyProducts)
-                                    <div class="admin-product-stack__extra" data-order-products-extra hidden>
-                                        @foreach ($orderItems->skip(1) as $item)
-                                            <span class="admin-product-chip">
-                                                <img src="{{ $item->product->image_url }}" alt="">
-                                                <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                            </span>
-                                        @endforeach
-                                    </div>
-
-                                    <button class="admin-products-toggle" type="button" data-order-products-toggle aria-expanded="false">
-                                        <iconify-icon icon="solar:menu-dots-bold"></iconify-icon>
-                                        <span data-toggle-label>+{{ $orderItems->count() - 1 }} altri prodotti</span>
-                                    </button>
-                                @endif
-                            </div>
+                            <x-admin.order-products :items="$order->items" />
                         </td>
-                        <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td><span class="badge {{ $order->status }}">{{ $order->statusLabel() }}</span></td>
+                        <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                         <td>
                             <div class="admin-actions">
@@ -109,7 +84,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr data-orders-empty-row><td colspan="6">Nessun ordine in attesa: il banco e libero.</td></tr>
+                    <tr data-orders-empty-row><td colspan="8">Nessun ordine in attesa: il banco e libero.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -53,14 +53,7 @@
                     <tr>
                         <td>
                             <strong>{{ $order->customer_name }}</strong><br>
-                            <div class="admin-product-stack">
-                                @foreach ($order->items as $item)
-                                    <span class="admin-product-chip">
-                                        <img src="{{ $item->product->image_url }}" alt="">
-                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                    </span>
-                                @endforeach
-                            </div>
+                            <x-admin.order-products :items="$order->items" />
                         </td>
                         <td>{{ $order->table_number }}</td>
                         <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>

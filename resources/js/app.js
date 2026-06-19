@@ -1,4 +1,6 @@
 
+import '@fontsource/lora/latin-600.css';
+import '@fontsource/lora/latin-700.css';
 import 'iconify-icon';
 import Alpine from 'alpinejs';
 import echo from './lib/echo';
@@ -373,12 +375,13 @@ if (realtimeOrders) {
         row.className = 'is-live-new';
         row.innerHTML = `
             <td>
-                <strong>${escapeHtml(order.customer_name)}</strong><br>
-                <small>Tavolo ${escapeHtml(order.table_number)} · ${escapeHtml(order.slug)}</small>
+                <strong>${escapeHtml(order.customer_name)}</strong>
             </td>
+            <td><small>${escapeHtml(order.slug)}</small></td>
+            <td>${escapeHtml(order.table_number)}</td>
             <td>${orderProducts(order)}</td>
-            <td>${euroFormatter.format(Number(order.total_price || 0))}</td>
             <td><span class="badge ${escapeHtml(order.status)}">${escapeHtml(order.status_label || order.status)}</span></td>
+            <td>${euroFormatter.format(Number(order.total_price || 0))}</td>
             <td>${order.created_at ? dateFormatter.format(new Date(order.created_at)) : ''}</td>
             <td>${orderActions(order)}</td>
         `;

@@ -48,14 +48,7 @@
                             <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
                         </td>
                         <td>
-                            <div class="admin-product-stack">
-                                @foreach ($order->items as $item)
-                                    <span class="admin-product-chip">
-                                        <img src="{{ $item->product->image_url }}" alt="">
-                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                    </span>
-                                @endforeach
-                            </div>
+                            <x-admin.order-products :items="$order->items" />
                         </td>
                         <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td>{{ $order->delivered_at?->format('d/m/Y H:i') }}</td>

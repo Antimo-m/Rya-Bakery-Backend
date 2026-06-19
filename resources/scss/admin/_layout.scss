@@ -56,10 +56,17 @@
     height: 46px;
     display: grid;
     place-items: center;
+    flex: 0 0 auto;
     border-radius: 14px;
-    background: linear-gradient(135deg, var(--rya-yellow), var(--rya-accent));
-    color: #2a1b18;
-    font-weight: 900;
+    background: #fffaf4;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .16);
+    overflow: hidden;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 }
 
 .admin-nav {
@@ -160,9 +167,11 @@
 
     h1 {
         margin: 0;
-        font-size: clamp(32px, 4vw, 44px);
+        color: var(--rya-title);
+        font-family: var(--rya-heading);
+        font-size: var(--rya-title-lg);
         font-weight: 700;
         letter-spacing: 0;
-        line-height: .96;
+        line-height: 1.08;
     }
 }
