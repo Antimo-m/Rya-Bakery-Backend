@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderHistory;
@@ -79,6 +80,12 @@ class OrderHistoryController extends Controller
         ]);
 
         $history->update(['restored_at' => now()]);
+
+        try {
+            event(new OrderStatusUpdated($order->load('items.product')));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
 
         return redirect()->route('admin.orders.index')->with('success', 'Ordine ripristinato negli ordini attivi.');
     }

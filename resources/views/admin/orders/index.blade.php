@@ -4,6 +4,10 @@
             <span class="admin-kicker">Servizio tavoli</span>
             <h1>Ordini</h1>
         </div>
+        <button class="admin-btn secondary admin-sound-toggle" type="button" data-order-sound-toggle aria-pressed="false">
+            <iconify-icon icon="solar:bell-off-linear" data-sound-icon></iconify-icon>
+            <span data-sound-label>Audio spento</span>
+        </button>
     </x-slot>
 
     <section
@@ -69,7 +73,7 @@
                         <td>
                             <div class="admin-actions">
                                 @if ($order->status === \App\Models\Order::STATUS_RECEIVED)
-                                    <form method="POST" action="{{ route('admin.orders.accept', $order) }}" data-confirm="Accettare questo ordine e metterlo in lavorazione?">
+                                    <form method="POST" action="{{ route('admin.orders.accept', $order) }}" data-confirm="Prendere questo ordine in preparazione?">
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
@@ -105,7 +109,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr data-orders-empty-row><td colspan="6">Nessun ordine ricevuto.</td></tr>
+                    <tr data-orders-empty-row><td colspan="6">Nessun ordine in attesa: il banco e libero.</td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -21,7 +21,7 @@
     <section class="admin-grid stats-grid">
         <article class="admin-card"><span>Ordini attivi</span><strong>{{ $ordersTotal }}</strong><em>in gestione</em></article>
         <article class="admin-card"><span>Ricevuti</span><strong>{{ $ordersPending }}</strong><em>da accettare</em></article>
-        <article class="admin-card"><span>In lavorazione</span><strong>{{ $ordersAccepted }}</strong><em>al banco</em></article>
+        <article class="admin-card"><span>In preparazione</span><strong>{{ $ordersAccepted }}</strong><em>al banco</em></article>
         <article class="admin-card"><span>Annullati</span><strong>{{ $ordersCancelled }}</strong><em>in storico</em></article>
         <article class="admin-card"><span>Prodotti totali</span><strong>{{ $productsTotal }}</strong><em>a catalogo</em></article>
         <article class="admin-card"><span>Disponibili</span><strong>{{ $productsAvailable }}</strong><em>ordinabili</em></article>
@@ -68,7 +68,7 @@
                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5">Nessun ordine ricevuto.</td></tr>
+                    <tr><td colspan="5">Il banco e tranquillo: nessun ordine in attesa.</td></tr>
                 @endforelse
             </tbody>
         </table>

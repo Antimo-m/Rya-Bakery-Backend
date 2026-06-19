@@ -171,6 +171,28 @@
     }
 }
 
+.admin-sound-toggle {
+    min-height: 44px;
+    border-color: rgba(183, 95, 50, .18);
+    background: rgba(255, 250, 245, .86);
+    color: var(--rya-soft-ink);
+
+    &.is-on {
+        color: #174c3b;
+        background: #dcf3ea;
+        border-color: rgba(22, 101, 52, .18);
+    }
+}
+
+.admin-export-action {
+    min-height: 44px;
+    padding-inline: 14px;
+
+    iconify-icon {
+        font-size: 20px;
+    }
+}
+
 .admin-products-footer {
     display: grid;
     place-items: center;

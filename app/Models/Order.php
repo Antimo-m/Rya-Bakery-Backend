@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['slug', 'customer_name', 'table_number', 'status', 'total_price', 'notes', 'accepted_at', 'cancelled_at', 'delivered_at'])]
 class Order extends Model
@@ -15,14 +15,18 @@ class Order extends Model
     use HasFactory;
 
     public const STATUS_RECEIVED = 'received';
+
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_CANCELLED = 'cancelled';
+
     public const STATUS_DELIVERED = 'delivered';
+
     public const MAX_PRODUCT_QUANTITY = 20;
 
     public const STATUSES = [
         self::STATUS_RECEIVED => 'Ricevuto',
-        self::STATUS_PENDING => 'In lavorazione',
+        self::STATUS_PENDING => 'In preparazione',
         self::STATUS_CANCELLED => 'Annullato',
         self::STATUS_DELIVERED => 'Pronto / Completato',
     ];

@@ -35,11 +35,14 @@ class ProductController extends Controller
         $data['slug'] = $this->slug($data['name']);
         $data['is_available'] = $request->boolean('is_available');
         $data['is_active'] = $request->boolean('is_active');
+        $data['is_best_seller'] = $request->boolean('is_best_seller');
+        $data['is_new'] = $request->boolean('is_new');
+        $data['is_freshly_baked'] = $request->boolean('is_freshly_baked');
         $data['image_path'] = $request->file('image')?->store('products', 'public');
 
         Product::create($data);
 
-        return redirect()->route('admin.products.index')->with('success', 'Prodotto creato correttamente.');
+        return redirect()->route('admin.products.index')->with('success', 'Prodotto aggiunto al banco digitale.');
     }
 
     public function edit(Product $product): View
@@ -57,6 +60,9 @@ class ProductController extends Controller
         $data['slug'] = $this->slug($data['name'], $product);
         $data['is_available'] = $request->boolean('is_available');
         $data['is_active'] = $request->boolean('is_active');
+        $data['is_best_seller'] = $request->boolean('is_best_seller');
+        $data['is_new'] = $request->boolean('is_new');
+        $data['is_freshly_baked'] = $request->boolean('is_freshly_baked');
 
         if ($request->hasFile('image')) {
             if ($product->image_path) {
@@ -68,7 +74,7 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('admin.products.index')->with('success', 'Prodotto modificato correttamente.');
+        return redirect()->route('admin.products.index')->with('success', 'Prodotto aggiornato nel catalogo.');
     }
 
     public function destroy(Product $product): RedirectResponse
@@ -79,7 +85,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('admin.products.index')->with('success', 'Prodotto eliminato correttamente.');
+        return redirect()->route('admin.products.index')->with('success', 'Prodotto rimosso dal catalogo.');
     }
 
     private function validated(Request $request, ?Product $product = null): array
@@ -92,6 +98,9 @@ class ProductController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_available' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
+            'is_best_seller' => ['nullable', 'boolean'],
+            'is_new' => ['nullable', 'boolean'],
+            'is_freshly_baked' => ['nullable', 'boolean'],
         ], [
             'name.required' => 'Inserisci il nome del prodotto.',
             'price.required' => 'Inserisci il prezzo del prodotto.',

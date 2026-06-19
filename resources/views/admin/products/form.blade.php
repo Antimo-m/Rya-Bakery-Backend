@@ -78,6 +78,24 @@
                 <strong>Attivo</strong>
                 <small data-on="Attivo" data-off="Disattivato"></small>
             </label>
+            <label class="switch-control">
+                <input type="checkbox" name="is_best_seller" value="1" @checked(old('is_best_seller', $product->is_best_seller))>
+                <span aria-hidden="true"></span>
+                <strong>Best Seller</strong>
+                <small data-on="In evidenza" data-off="Standard"></small>
+            </label>
+            <label class="switch-control">
+                <input type="checkbox" name="is_new" value="1" @checked(old('is_new', $product->is_new))>
+                <span aria-hidden="true"></span>
+                <strong>Novita</strong>
+                <small data-on="Novita" data-off="Standard"></small>
+            </label>
+            <label class="switch-control">
+                <input type="checkbox" name="is_freshly_baked" value="1" @checked(old('is_freshly_baked', $product->is_freshly_baked))>
+                <span aria-hidden="true"></span>
+                <strong>Appena sfornato</strong>
+                <small data-on="Dal banco caldo" data-off="Standard"></small>
+            </label>
         </div>
 
         <div class="admin-actions">

@@ -199,6 +199,12 @@ if (realtimeOrders) {
     const tbody = realtimeOrders.querySelector('[data-orders-table-body]');
     const emptyRow = realtimeOrders.querySelector('[data-orders-empty-row]');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const soundToggle = document.querySelector('[data-order-sound-toggle]');
+    const soundLabel = soundToggle?.querySelector('[data-sound-label]');
+    const soundIcon = soundToggle?.querySelector('[data-sound-icon]');
+    let soundEnabled = localStorage.getItem('rya-admin-order-sound') === 'on';
+    let audioContext = null;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     const euroFormatter = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
     const dateFormatter = new Intl.DateTimeFormat('it-IT', {
         day: '2-digit',
@@ -224,7 +230,7 @@ if (realtimeOrders) {
 
         return `
             <div class="admin-actions">
-                <form method="POST" action="${acceptUrl}" data-confirm="Accettare questo ordine e metterlo in lavorazione?">
+                <form method="POST" action="${acceptUrl}" data-confirm="Prendere questo ordine in preparazione?">
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
                     <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
@@ -244,6 +250,65 @@ if (realtimeOrders) {
             </div>
         `;
     };
+
+    const syncSoundToggle = () => {
+        if (!soundToggle || !soundLabel || !soundIcon) {
+            return;
+        }
+
+        soundToggle.setAttribute('aria-pressed', String(soundEnabled));
+        soundToggle.classList.toggle('is-on', soundEnabled);
+        soundLabel.textContent = soundEnabled ? 'Audio attivo' : 'Audio spento';
+        soundIcon.setAttribute('icon', soundEnabled ? 'solar:bell-bing-bold-duotone' : 'solar:bell-off-linear');
+    };
+
+    const playOrderChime = () => {
+        if (!soundEnabled) {
+            return;
+        }
+
+        if (!AudioContextClass) {
+            return;
+        }
+
+        audioContext ??= new AudioContextClass();
+
+        const now = audioContext.currentTime;
+        const notes = [659.25, 783.99];
+
+        notes.forEach((frequency, index) => {
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            const start = now + (index * 0.11);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(0.08, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.18);
+            oscillator.connect(gain).connect(audioContext.destination);
+            oscillator.start(start);
+            oscillator.stop(start + 0.2);
+        });
+    };
+
+    soundToggle?.addEventListener('click', async () => {
+        soundEnabled = !soundEnabled;
+        localStorage.setItem('rya-admin-order-sound', soundEnabled ? 'on' : 'off');
+        syncSoundToggle();
+
+        if (soundEnabled) {
+            if (!AudioContextClass) {
+                return;
+            }
+
+            audioContext ??= new AudioContextClass();
+            await audioContext.resume();
+            playOrderChime();
+        }
+    });
+
+    syncSoundToggle();
 
     const productChip = (item) => `
         <span class="admin-product-chip">
@@ -377,10 +442,12 @@ if (realtimeOrders) {
             syncMissingOrders();
         })
         .listen('.order.created', (event) => {
-        if (!prependOrder(event.order)) {
-            return;
-        }
-    });
+            if (!prependOrder(event.order)) {
+                return;
+            }
+
+            playOrderChime();
+        });
 }
 
 const monthFormatter = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' });

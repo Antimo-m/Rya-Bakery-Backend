@@ -35,6 +35,13 @@
                                 <div>
                                     <strong>{{ $product->name }}</strong><br>
                                     <small>{{ $product->slug }}</small>
+                                    @if ($product->specialBadges() !== [])
+                                        <div class="admin-special-badges" aria-label="Evidenze prodotto">
+                                            @foreach ($product->specialBadges() as $badge)
+                                                <span class="admin-special-badge {{ $badge['type'] }}">{{ $badge['label'] }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </td>

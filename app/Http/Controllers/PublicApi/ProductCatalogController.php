@@ -30,6 +30,7 @@ class ProductCatalogController extends Controller
                 'price' => (float) $product->price,
                 'image_url' => $product->image_url,
                 'is_available' => $product->is_available,
+                'badges' => $product->specialBadges(),
             ]),
             'categories' => Product::query()
                 ->where('is_active', true)
@@ -60,6 +61,7 @@ class ProductCatalogController extends Controller
                 'price' => (float) $product->price,
                 'image_url' => $product->image_url,
                 'is_available' => $product->is_available,
+                'badges' => $product->specialBadges(),
             ],
         ]);
     }

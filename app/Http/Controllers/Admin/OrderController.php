@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderHistory;
@@ -73,6 +74,8 @@ class OrderController extends Controller
                 ->withInput();
         }
 
+        $previousStatus = $order->status;
+
         DB::transaction(function () use ($order, $data): void {
             $order->update([
                 'customer_name' => $data['customer_name'],
@@ -99,7 +102,11 @@ class OrderController extends Controller
             $order->recalculateTotal();
         });
 
-        return redirect()->route('admin.orders.index')->with('success', 'Ordine modificato correttamente.');
+        if ($order->status !== $previousStatus) {
+            $this->broadcastStatus($order->load('items.product'));
+        }
+
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine aggiornato al banco.');
     }
 
     public function accept(Order $order): RedirectResponse
@@ -113,7 +120,9 @@ class OrderController extends Controller
             'accepted_at' => now(),
         ]);
 
-        return back()->with('success', 'Ordine accettato.');
+        $this->broadcastStatus($order->load('items.product'));
+
+        return back()->with('success', 'Ordine preso in preparazione.');
     }
 
     public function cancel(Order $order): RedirectResponse
@@ -135,6 +144,8 @@ class OrderController extends Controller
             ]);
         });
 
+        $this->broadcastStatus($order->load('items.product'));
+
         return redirect()->route('admin.order-history.index')->with('success', 'Ordine annullato e spostato nello storico.');
     }
 
@@ -149,14 +160,16 @@ class OrderController extends Controller
             'delivered_at' => now(),
         ]);
 
-        return back()->with('success', 'Ordine consegnato. Restera negli ordini attivi per 10 minuti.');
+        $this->broadcastStatus($order->load('items.product'));
+
+        return back()->with('success', 'Ordine pronto e completato. Restera negli ordini attivi per 10 minuti.');
     }
 
     public function destroy(Order $order): RedirectResponse
     {
         $order->delete();
 
-        return redirect()->route('admin.orders.index')->with('success', 'Ordine eliminato correttamente.');
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine rimosso dal banco operativo.');
     }
 
     private function livePayload(Order $order): array
@@ -183,5 +196,14 @@ class OrderController extends Controller
                 ],
             ])->all(),
         ];
+    }
+
+    private function broadcastStatus(Order $order): void
+    {
+        try {
+            event(new OrderStatusUpdated($order));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
     }
 }

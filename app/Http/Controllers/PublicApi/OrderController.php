@@ -78,7 +78,7 @@ class OrderController extends Controller
         }
 
         return response()->json([
-            'message' => 'Ordine inviato correttamente. Lo staff lo vedra tra gli ordini in attesa.',
+            'message' => 'Ordine inviato al banco. Lo staff lo prendera in preparazione.',
             'order' => $this->payload($order),
         ], 201);
     }

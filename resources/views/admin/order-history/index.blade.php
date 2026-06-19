@@ -4,7 +4,8 @@
             <span class="admin-kicker">Archivio operativo</span>
             <h1>Storico ordini</h1>
         </div>
-        <a class="admin-btn secondary admin-btn--icon" href="{{ route('admin.order-history.export', request()->query()) }}" aria-label="Esporta CSV" title="Esporta CSV">
+        <a class="admin-btn secondary admin-export-action" href="{{ route('admin.order-history.export', request()->query()) }}" aria-label="Esporta storico ordini in CSV" title="Esporta storico ordini">
+            <span>Esporta storico ordini</span>
             <iconify-icon icon="solar:download-square-bold-duotone"></iconify-icon>
         </a>
     </x-slot>
@@ -12,7 +13,7 @@
     <form class="admin-filters" method="GET" action="{{ route('admin.order-history.index') }}">
         <label>
             Cerca
-            <input name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cliente, tavolo o codice ordine">
+            <input name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cerca cliente, tavolo o codice ordine">
         </label>
         <label>
             Motivo
@@ -36,8 +37,8 @@
                 <input name="to" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" value="{{ $filters['to'] ?? '' }}">
             </span>
         </label>
-        <button class="admin-btn" type="submit">Filtra</button>
-        <a class="admin-btn secondary" href="{{ route('admin.order-history.index') }}">Reset</a>
+        <button class="admin-btn" type="submit">Applica filtri</button>
+        <a class="admin-btn secondary" href="{{ route('admin.order-history.index') }}">Pulisci</a>
     </form>
 
     <section class="admin-table-wrap">
@@ -72,9 +73,9 @@
                         <td><span class="badge {{ $history->reason }}">{{ $history->reasonLabel() }}</span></td>
                         <td>
                             @if ($history->restorable_until)
-                                {{ $history->canRestore() ? 'Disponibile fino a '.$history->restorable_until->format('H:i') : 'Scaduto' }}
+                                {{ $history->canRestore() ? 'Recuperabile fino alle '.$history->restorable_until->format('H:i') : 'Tempo scaduto' }}
                             @else
-                                Non disponibile
+                                Archiviato definitivamente
                             @endif
                         </td>
                         <td>{{ $history->archived_at->format('d/m/Y H:i') }}</td>
@@ -93,11 +94,37 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6">Nessun ordine nello storico.</td></tr>
+                    <tr><td colspan="6">Lo storico e ancora vuoto: qui troverai ordini completati e annullati.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </section>
 
-    <div style="margin-top: 18px">{{ $histories->links() }}</div>
+    @if ($histories->hasPages())
+        <footer class="admin-products-footer">
+            <nav class="admin-pagination" aria-label="Paginazione storico ordini">
+                @if ($histories->onFirstPage())
+                    <span class="admin-pagination__button is-disabled" aria-disabled="true">
+                        <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
+                    </span>
+                @else
+                    <a class="admin-pagination__button" href="{{ $histories->previousPageUrl() }}" rel="prev" aria-label="Pagina precedente">
+                        <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon>
+                    </a>
+                @endif
+
+                <span class="admin-pagination__summary" aria-current="page">Pagina {{ $histories->currentPage() }} di {{ $histories->lastPage() }}</span>
+
+                @if ($histories->hasMorePages())
+                    <a class="admin-pagination__button" href="{{ $histories->nextPageUrl() }}" rel="next" aria-label="Pagina successiva">
+                        <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+                    </a>
+                @else
+                    <span class="admin-pagination__button is-disabled" aria-disabled="true">
+                        <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+                    </span>
+                @endif
+            </nav>
+        </footer>
+    @endif
 </x-app-layout>
