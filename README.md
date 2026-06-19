@@ -48,7 +48,7 @@ Funzionalita disponibili:
 - Upload immagini limitato a `jpg`, `jpeg`, `png`, `webp` e massimo 2 MB.
 - Mass assignment limitato sui modelli tramite attributi `Fillable`.
 - Gli ID restano interni al database; prodotti e ordini usano slug verso l'esterno.
-- La struttura API e pronta per aggiungere Laravel Broadcasting/Reverb per aggiornamenti real-time degli ordini.
+
 
 ## Autore
 

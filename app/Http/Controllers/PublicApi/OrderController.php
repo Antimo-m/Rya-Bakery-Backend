@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\PublicApi;
 
+use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -68,6 +70,12 @@ class OrderController extends Controller
 
             return $order->load('items.product');
         });
+
+        try {
+            event(new OrderCreated($order));
+        } catch (Throwable $exception) {
+            report($exception);
+        }
 
         return response()->json([
             'message' => 'Ordine inviato correttamente. Lo staff lo vedra tra gli ordini in attesa.',

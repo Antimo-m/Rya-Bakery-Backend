@@ -32,11 +32,16 @@
     }
 
     tbody tr {
-        transition: background-color .16s ease;
+        transition: background-color .16s ease, box-shadow .16s ease;
     }
 
     tbody tr:hover {
         background: #fffaf5;
+    }
+
+    tbody tr.is-live-new {
+        background: #fff2d9;
+        box-shadow: inset 4px 0 0 var(--rya-accent);
     }
 }
 

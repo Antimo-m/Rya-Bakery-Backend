@@ -6,7 +6,15 @@
         </div>
     </x-slot>
 
-    <section class="admin-table-wrap">
+    <section
+        class="admin-table-wrap"
+        data-realtime-orders
+        data-accept-url-template="{{ route('admin.orders.accept', ['order' => '__SLUG__']) }}"
+        data-cancel-url-template="{{ route('admin.orders.cancel', ['order' => '__SLUG__']) }}"
+        data-edit-url-template="{{ route('admin.orders.edit', ['order' => '__SLUG__']) }}"
+        data-live-url="{{ route('admin.orders.live') }}"
+    >
+        <div class="admin-live-status" data-orders-live-status role="status" aria-live="polite"></div>
         <table class="admin-table">
             <thead>
                 <tr>
@@ -18,9 +26,9 @@
                     <th>Azioni</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody data-orders-table-body>
                 @forelse ($orders as $order)
-                    <tr>
+                    <tr data-order-id="{{ $order->id }}">
                         <td>
                             <strong>{{ $order->customer_name }}</strong><br>
                             <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
@@ -77,7 +85,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6">Nessun ordine ricevuto.</td></tr>
+                    <tr data-orders-empty-row><td colspan="6">Nessun ordine ricevuto.</td></tr>
                 @endforelse
             </tbody>
         </table>

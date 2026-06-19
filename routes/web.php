@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->name('admin.')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/analysis', AnalysisController::class)->name('analysis.index');
     Route::resource('products', ProductController::class)->except(['show']);
+    Route::get('orders/live', [OrderController::class, 'liveIndex'])->name('orders.live');
     Route::resource('orders', OrderController::class)->except(['create', 'store', 'show']);
     Route::patch('orders/{order:slug}/accept', [OrderController::class, 'accept'])->name('orders.accept');
     Route::patch('orders/{order:slug}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');

@@ -1,6 +1,7 @@
 
 import 'iconify-icon';
 import Alpine from 'alpinejs';
+import echo from './lib/echo';
 
 window.Alpine = Alpine;
 
@@ -23,7 +24,7 @@ document.querySelectorAll('.admin-sidebar a').forEach((link) => {
     link.addEventListener('click', () => setAdminMenu(false));
 });
 
-document.querySelectorAll('.admin-table').forEach((table) => {
+function syncTableLabels(table) {
     const headers = Array.from(table.querySelectorAll('thead th')).map((cell) => cell.textContent.trim());
 
     table.querySelectorAll('tbody tr').forEach((row) => {
@@ -33,6 +34,10 @@ document.querySelectorAll('.admin-table').forEach((table) => {
             }
         });
     });
+}
+
+document.querySelectorAll('.admin-table').forEach((table) => {
+    syncTableLabels(table);
 });
 
 const confirmDialog = document.querySelector('[data-confirm-dialog]');
@@ -41,17 +46,17 @@ const confirmSubmit = document.querySelector('[data-confirm-submit]');
 const confirmCancel = document.querySelector('[data-confirm-cancel]');
 let pendingForm = null;
 
-document.querySelectorAll('form[data-confirm]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-        if (!confirmDialog) {
-            return;
-        }
+document.addEventListener('submit', (event) => {
+    const form = event.target.closest('form[data-confirm]');
 
-        event.preventDefault();
-        pendingForm = form;
-        confirmMessage.textContent = form.dataset.confirm || 'Vuoi continuare?';
-        confirmDialog.showModal();
-    });
+    if (!form || !confirmDialog) {
+        return;
+    }
+
+    event.preventDefault();
+    pendingForm = form;
+    confirmMessage.textContent = form.dataset.confirm || 'Vuoi continuare?';
+    confirmDialog.showModal();
 });
 
 confirmCancel?.addEventListener('click', () => {
@@ -186,6 +191,185 @@ document.querySelectorAll('select[data-custom-select]').forEach((select) => {
     select.classList.add('native-select-hidden');
     select.after(wrapper);
 });
+
+const realtimeOrders = document.querySelector('[data-realtime-orders]');
+
+if (realtimeOrders) {
+    const table = realtimeOrders.querySelector('.admin-table');
+    const tbody = realtimeOrders.querySelector('[data-orders-table-body]');
+    const emptyRow = realtimeOrders.querySelector('[data-orders-empty-row]');
+    const liveStatus = realtimeOrders.querySelector('[data-orders-live-status]');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const euroFormatter = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
+    const dateFormatter = new Intl.DateTimeFormat('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
+    const setLiveStatus = (message, state = 'info') => {
+        if (!liveStatus) {
+            return;
+        }
+
+        liveStatus.textContent = message;
+        liveStatus.dataset.state = state;
+        liveStatus.classList.add('is-visible');
+    };
+
+    const fillTemplate = (template, slug) => template.replace('__SLUG__', encodeURIComponent(slug));
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+    }[character]));
+
+    const orderActions = (order) => {
+        const acceptUrl = fillTemplate(realtimeOrders.dataset.acceptUrlTemplate, order.slug);
+        const cancelUrl = fillTemplate(realtimeOrders.dataset.cancelUrlTemplate, order.slug);
+        const editUrl = fillTemplate(realtimeOrders.dataset.editUrlTemplate, order.slug);
+
+        return `
+            <div class="admin-actions">
+                <form method="POST" action="${acceptUrl}" data-confirm="Accettare questo ordine e metterlo in lavorazione?">
+                    <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
+                        <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                    </button>
+                </form>
+                <form method="POST" action="${cancelUrl}" data-confirm="Annullare o rifiutare questo ordine? Sara spostato nello storico.">
+                    <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button class="admin-btn danger admin-btn--icon" type="submit" aria-label="Annulla ordine" title="Annulla">
+                        <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                    </button>
+                </form>
+                <a class="admin-btn edit admin-btn--icon" href="${editUrl}" aria-label="Modifica ordine" title="Modifica">
+                    <iconify-icon icon="solar:pen-new-square-bold-duotone"></iconify-icon>
+                </a>
+            </div>
+        `;
+    };
+
+    const orderProducts = (order) => `
+        <div class="admin-product-stack">
+            ${(order.items || []).map((item) => `
+                <span class="admin-product-chip">
+                    <img src="${escapeHtml(item.product?.image_url || '')}" alt="">
+                    <span>${escapeHtml(item.quantity)}x ${escapeHtml(item.product?.name || 'Prodotto')}</span>
+                </span>
+            `).join('')}
+        </div>
+    `;
+
+    const orderRow = (order) => {
+        const row = document.createElement('tr');
+        row.dataset.orderId = order.id;
+        row.className = 'is-live-new';
+        row.innerHTML = `
+            <td>
+                <strong>${escapeHtml(order.customer_name)}</strong><br>
+                <small>Tavolo ${escapeHtml(order.table_number)} · ${escapeHtml(order.slug)}</small>
+            </td>
+            <td>${orderProducts(order)}</td>
+            <td>${euroFormatter.format(Number(order.total_price || 0))}</td>
+            <td><span class="badge ${escapeHtml(order.status)}">${escapeHtml(order.status_label || order.status)}</span></td>
+            <td>${order.created_at ? dateFormatter.format(new Date(order.created_at)) : ''}</td>
+            <td>${orderActions(order)}</td>
+        `;
+
+        return row;
+    };
+
+    const prependOrder = (order) => {
+        if (!order || !tbody || tbody.querySelector(`[data-order-id="${order.id}"]`)) {
+            return false;
+        }
+
+        emptyRow?.remove();
+        const row = orderRow(order);
+        tbody.prepend(row);
+
+        if (table) {
+            syncTableLabels(table);
+        }
+
+        window.setTimeout(() => row.classList.remove('is-live-new'), 5000);
+
+        return true;
+    };
+
+    const syncMissingOrders = async () => {
+        if (!realtimeOrders.dataset.liveUrl) {
+            return;
+        }
+
+        try {
+            const response = await fetch(realtimeOrders.dataset.liveUrl, {
+                headers: { Accept: 'application/json' },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            const missingOrders = (data.orders || []).filter((order) => (
+                !tbody?.querySelector(`[data-order-id="${order.id}"]`)
+            ));
+
+            missingOrders.reverse().forEach((order) => prependOrder(order));
+
+            if (missingOrders.length > 0) {
+                setLiveStatus(`${missingOrders.length} ordini recuperati e sincronizzati.`, 'success');
+            }
+        } catch {
+            setLiveStatus('Realtime connesso, ma non riesco a sincronizzare gli ordini mancanti.', 'warning');
+        }
+    };
+
+    echo.connector.pusher.connection.bind('state_change', ({ current }) => {
+        if (current === 'connected') {
+            setLiveStatus('Realtime connesso: i nuovi ordini appariranno automaticamente.', 'success');
+            syncMissingOrders();
+            return;
+        }
+
+        if (['connecting', 'unavailable'].includes(current)) {
+            setLiveStatus('Realtime in connessione: controllo nuovi ordini in corso.', 'warning');
+            return;
+        }
+
+        if (['failed', 'disconnected'].includes(current)) {
+            setLiveStatus('Realtime non connesso: avvia php artisan reverb:start e ricarica la pagina.', 'error');
+        }
+    });
+
+    echo.connector.pusher.connection.bind('error', () => {
+        setLiveStatus('Realtime non connesso: verifica che Reverb sia avviato e raggiungibile da questo dispositivo.', 'error');
+    });
+
+    echo.channel('orders')
+        .subscribed(() => {
+            setLiveStatus('Realtime connesso: i nuovi ordini appariranno automaticamente.', 'success');
+            syncMissingOrders();
+        })
+        .listen('.order.created', (event) => {
+        if (!prependOrder(event.order)) {
+            return;
+        }
+
+        if (liveStatus) {
+            setLiveStatus(`Nuovo ordine ricevuto: ${event.order.customer_name}, tavolo ${event.order.table_number}.`, 'success');
+        }
+    });
+}
 
 const monthFormatter = new Intl.DateTimeFormat('it-IT', { month: 'long', year: 'numeric' });
 const weekDays = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];

@@ -15,6 +15,33 @@
     }
 }
 
+.admin-live-status {
+    display: none;
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(22, 101, 52, .18);
+    border-radius: var(--rya-radius-md);
+    background: #dcf3ea;
+    color: #174c3b;
+    font-weight: 850;
+
+    &.is-visible {
+        display: block;
+    }
+
+    &[data-state="warning"] {
+        border-color: rgba(180, 83, 9, .22);
+        background: #fff2d9;
+        color: #7c3d12;
+    }
+
+    &[data-state="error"] {
+        border-color: rgba(185, 28, 28, .22);
+        background: #ffe3df;
+        color: #7a2420;
+    }
+}
+
 .admin-grid {
     display: grid;
     gap: 16px;
