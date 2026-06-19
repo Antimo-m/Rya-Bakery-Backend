@@ -22,7 +22,8 @@ Route::middleware(['auth', 'verified'])->name('admin.')->group(function () {
     Route::get('products/{product:slug}/scheda', [ProductController::class, 'edit'])->name('products.edit');
     Route::resource('products', ProductController::class)->except(['show', 'edit']);
     Route::get('orders/live', [OrderController::class, 'liveIndex'])->middleware('throttle:admin-actions')->name('orders.live');
-    Route::resource('orders', OrderController::class)->except(['create', 'store', 'show']);
+    Route::get('orders/{order:slug}/scheda', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::resource('orders', OrderController::class)->except(['create', 'store', 'show', 'edit']);
     Route::patch('orders/{order:slug}/accept', [OrderController::class, 'accept'])->middleware('throttle:admin-actions')->name('orders.accept');
     Route::patch('orders/{order:slug}/cancel', [OrderController::class, 'cancel'])->middleware('throttle:admin-actions')->name('orders.cancel');
     Route::patch('orders/{order:slug}/complete', [OrderController::class, 'complete'])->middleware('throttle:admin-actions')->name('orders.complete');

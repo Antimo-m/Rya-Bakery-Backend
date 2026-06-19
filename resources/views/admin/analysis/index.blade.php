@@ -38,7 +38,9 @@
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th>Nome</th>
                     <th>Ordine</th>
+                    <th>Tavolo</th>
                     <th>Prodotti</th>
                     <th>Totale</th>
                     <th>Completato</th>
@@ -48,9 +50,10 @@
                 @forelse ($dayOrders as $order)
                     <tr>
                         <td>
-                            <strong>{{ $order->customer_name }}</strong><br>
-                            <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
+                            <strong>{{ $order->customer_name }}</strong>
                         </td>
+                        <td><small>{{ $order->slug }}</small></td>
+                        <td>{{ $order->table_number }}</td>
                         <td>
                             <x-admin.order-products :items="$order->items" />
                         </td>
@@ -58,7 +61,7 @@
                         <td>{{ $order->delivered_at?->format('d/m/Y H:i') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="4">Nessun ordine completato nel giorno selezionato.</td></tr>
+                    <tr><td colspan="6">Nessun ordine completato nel giorno selezionato.</td></tr>
                 @endforelse
             </tbody>
         </table>

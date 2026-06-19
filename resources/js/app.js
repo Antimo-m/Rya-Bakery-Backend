@@ -48,6 +48,31 @@ const confirmSubmit = document.querySelector('[data-confirm-submit]');
 const confirmCancel = document.querySelector('[data-confirm-cancel]');
 let pendingForm = null;
 
+const expandedOrderProducts = (container) => (
+    Array.from(container.querySelectorAll('.admin-product-chip')).length
+);
+
+document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-order-products-toggle]');
+
+    if (!toggle) {
+        return;
+    }
+
+    const stack = toggle.closest('[data-order-products]');
+    const extra = stack?.querySelector('[data-order-products-extra]');
+    const label = toggle.querySelector('[data-toggle-label]');
+
+    if (!extra || !label) {
+        return;
+    }
+
+    const willOpen = extra.hidden;
+    extra.hidden = !willOpen;
+    toggle.setAttribute('aria-expanded', String(willOpen));
+    label.textContent = willOpen ? 'Mostra meno' : `+${expandedOrderProducts(extra)} altri prodotti`;
+});
+
 document.addEventListener('submit', (event) => {
     const form = event.target.closest('form[data-confirm]');
 
@@ -343,31 +368,6 @@ if (realtimeOrders) {
             </div>
         `;
     };
-
-    const expandedOrderProducts = (container) => (
-        Array.from(container.querySelectorAll('.admin-product-chip')).length
-    );
-
-    document.addEventListener('click', (event) => {
-        const toggle = event.target.closest('[data-order-products-toggle]');
-
-        if (!toggle) {
-            return;
-        }
-
-        const stack = toggle.closest('[data-order-products]');
-        const extra = stack?.querySelector('[data-order-products-extra]');
-        const label = toggle.querySelector('[data-toggle-label]');
-
-        if (!extra || !label) {
-            return;
-        }
-
-        const willOpen = extra.hidden;
-        extra.hidden = !willOpen;
-        toggle.setAttribute('aria-expanded', String(willOpen));
-        label.textContent = willOpen ? 'Mostra meno' : `+${expandedOrderProducts(extra)} altri prodotti`;
-    });
 
     const orderRow = (order) => {
         const row = document.createElement('tr');

@@ -41,10 +41,12 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>Ultimi ordini</th>
+                    <th>Nome</th>
+                    <th>Ordine</th>
                     <th>Tavolo</th>
-                    <th>Totale</th>
+                    <th>Prodotti</th>
                     <th>Stato</th>
+                    <th>Totale</th>
                     <th>Ora</th>
                 </tr>
             </thead>
@@ -52,16 +54,19 @@
                 @forelse ($latestOrders as $order)
                     <tr>
                         <td>
-                            <strong>{{ $order->customer_name }}</strong><br>
+                            <strong>{{ $order->customer_name }}</strong>
+                        </td>
+                        <td><small>{{ $order->slug }}</small></td>
+                        <td>{{ $order->table_number }}</td>
+                        <td>
                             <x-admin.order-products :items="$order->items" />
                         </td>
-                        <td>{{ $order->table_number }}</td>
-                        <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td><span class="badge {{ $order->status }}">{{ $order->statusLabel() }}</span></td>
+                        <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5">Il banco e tranquillo: nessun ordine in attesa.</td></tr>
+                    <tr><td colspan="7">Il banco e tranquillo: nessun ordine in attesa.</td></tr>
                 @endforelse
             </tbody>
         </table>

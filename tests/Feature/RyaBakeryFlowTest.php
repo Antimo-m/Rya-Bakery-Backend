@@ -50,6 +50,60 @@ class RyaBakeryFlowTest extends TestCase
             ->assertJsonPath('categories.1', 'Salato');
     }
 
+    public function test_public_catalog_returns_most_ordered_products(): void
+    {
+        $popular = Product::factory()->create([
+            'name' => 'Coca Cola',
+            'slug' => 'coca-cola',
+            'is_active' => true,
+        ]);
+        $lessPopular = Product::factory()->create([
+            'name' => 'Cornetto',
+            'slug' => 'cornetto',
+            'is_active' => true,
+        ]);
+
+        foreach (range(1, 3) as $index) {
+            $order = Order::create([
+                'slug' => 'ordine-popular-'.$index,
+                'customer_name' => 'Cliente '.$index,
+                'table_number' => $index,
+                'status' => Order::STATUS_DELIVERED,
+                'total_price' => 3.00,
+                'delivered_at' => now(),
+            ]);
+
+            $order->items()->create([
+                'product_id' => $popular->id,
+                'quantity' => 1,
+                'unit_price' => 1.00,
+                'line_total' => 1.00,
+            ]);
+        }
+
+        $order = Order::create([
+            'slug' => 'ordine-less-popular',
+            'customer_name' => 'Cliente Cornetto',
+            'table_number' => 8,
+            'status' => Order::STATUS_DELIVERED,
+            'total_price' => 2.00,
+            'delivered_at' => now(),
+        ]);
+
+        $order->items()->create([
+            'product_id' => $lessPopular->id,
+            'quantity' => 5,
+            'unit_price' => 1.00,
+            'line_total' => 5.00,
+        ]);
+
+        $this->getJson('/api/products/most-ordered?limit=2')
+            ->assertOk()
+            ->assertJsonPath('products.0.slug', 'coca-cola')
+            ->assertJsonPath('products.0.orders_count', 3)
+            ->assertJsonPath('products.1.slug', 'cornetto');
+    }
+
     public function test_frontend_can_create_order_using_product_slug(): void
     {
         $product = Product::factory()->create([
@@ -118,6 +172,11 @@ class RyaBakeryFlowTest extends TestCase
             'unit_price' => 1.80,
             'line_total' => 1.80,
         ]);
+
+        $editUrl = route('admin.orders.edit', $order);
+
+        $this->assertStringNotContainsString('/edit', $editUrl);
+        $this->assertStringContainsString('/scheda', $editUrl);
 
         $this->actingAs($user)
             ->get(route('admin.orders.index'))

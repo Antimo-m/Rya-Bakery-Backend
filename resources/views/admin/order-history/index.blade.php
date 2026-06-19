@@ -45,7 +45,9 @@
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th>Nome</th>
                     <th>Ordine</th>
+                    <th>Tavolo</th>
                     <th>Prodotti</th>
                     <th>Motivo</th>
                     <th>Ripristino</th>
@@ -57,9 +59,10 @@
                 @forelse ($histories as $history)
                     <tr>
                         <td>
-                            <strong>{{ $history->order->customer_name }}</strong><br>
-                            <small>Tavolo {{ $history->order->table_number }} · {{ $history->order->slug }}</small>
+                            <strong>{{ $history->order->customer_name }}</strong>
                         </td>
+                        <td><small>{{ $history->order->slug }}</small></td>
+                        <td>{{ $history->order->table_number }}</td>
                         <td>
                             <x-admin.order-products :items="$history->order->items" />
                         </td>
@@ -87,7 +90,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6">Lo storico e ancora vuoto: qui troverai ordini completati e annullati.</td></tr>
+                    <tr><td colspan="8">Lo storico e ancora vuoto: qui troverai ordini completati e annullati.</td></tr>
                 @endforelse
             </tbody>
         </table>
