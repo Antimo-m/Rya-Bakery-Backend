@@ -301,13 +301,13 @@
     text-align: center;
 
     &.pending {
-        color: #7b4a13;
-        background: #ffe9bd;
+        color: #7a3f12;
+        background: #ffe1bd;
     }
 
     &.received {
-        color: #5e3b11;
-        background: #fff0cf;
+        color: #6a4615;
+        background: #fff1c9;
     }
 
     &.accepted,
@@ -323,8 +323,8 @@
     }
 
     &.delivered {
-        color: #17405c;
-        background: #dbeeff;
+        color: #17583f;
+        background: #e4f3d4;
     }
 }
 

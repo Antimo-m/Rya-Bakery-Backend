@@ -193,6 +193,10 @@ class RyaBakeryFlowTest extends TestCase
             ->assertRedirect(route('admin.products.index'));
 
         $product = Product::where('slug', 'maritozzo-crema')->firstOrFail();
+        $editUrl = route('admin.products.edit', $product);
+
+        $this->assertStringNotContainsString('/edit', $editUrl);
+        $this->assertStringContainsString('/scheda', $editUrl);
 
         $this->actingAs($user)
             ->put(route('admin.products.update', $product), [
@@ -357,7 +361,7 @@ class RyaBakeryFlowTest extends TestCase
         $this->assertNotNull($order->histories()->first()->restored_at);
     }
 
-    public function test_admin_can_complete_order_and_it_is_archived_after_10_minutes(): void
+    public function test_admin_can_complete_order_and_it_is_archived_immediately(): void
     {
         $user = User::factory()->create();
         $order = Order::create([
@@ -370,12 +374,10 @@ class RyaBakeryFlowTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('admin.orders.complete', $order))
+            ->assertRedirect(route('admin.order-history.index'))
             ->assertSessionHas('success');
 
         $this->assertSame(Order::STATUS_DELIVERED, $order->fresh()->status);
-
-        $order->update(['delivered_at' => now()->subMinutes(11)]);
-        Order::archiveDeliveredOrders();
 
         $this->assertDatabaseHas('order_histories', [
             'order_id' => $order->id,

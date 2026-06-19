@@ -65,11 +65,7 @@ class Order extends Model
     {
         return $query
             ->whereDoesntHave('activeHistory')
-            ->where(function (Builder $query): void {
-                $query
-                    ->whereNull('delivered_at')
-                    ->orWhere('delivered_at', '>', now()->subMinutes(10));
-            });
+            ->whereIn('status', [self::STATUS_RECEIVED, self::STATUS_PENDING]);
     }
 
     public function scopeAwaiting(Builder $query): Builder
@@ -94,12 +90,11 @@ class Order extends Model
         self::query()
             ->where('status', self::STATUS_DELIVERED)
             ->whereNotNull('delivered_at')
-            ->where('delivered_at', '<=', now()->subMinutes(10))
             ->whereDoesntHave('activeHistory')
             ->each(function (Order $order): void {
                 $order->histories()->create([
                     'reason' => OrderHistory::REASON_DELIVERED,
-                    'archived_at' => $order->delivered_at,
+                    'archived_at' => $order->delivered_at ?? now(),
                 ]);
             });
     }

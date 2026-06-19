@@ -42,9 +42,8 @@
                     <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon> Dashboard</a>
                     <a class="{{ request()->routeIs('admin.analysis.*') ? 'active' : '' }}" href="{{ route('admin.analysis.index') }}"><iconify-icon icon="solar:graph-new-up-bold-duotone"></iconify-icon> Analisi</a>
                     <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><iconify-icon icon="solar:donut-bitten-bold-duotone"></iconify-icon> Prodotti</a>
-                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini</a>
+                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini in arrivo</a>
                     <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><iconify-icon icon="solar:archive-bold-duotone"></iconify-icon> Storico ordini</a>
-                    <a class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.edit') }}"><iconify-icon icon="solar:settings-bold-duotone"></iconify-icon> Impostazioni</a>
                 </nav>
 
                 <div class="admin-user">
@@ -95,7 +94,7 @@
                         Annulla
                     </button>
                     <button class="admin-btn success" type="button" data-confirm-submit>
-                        <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
+                        <iconify-icon icon="solar:clipboard-check-bold-duotone"></iconify-icon>
                         Conferma
                     </button>
                 </div>

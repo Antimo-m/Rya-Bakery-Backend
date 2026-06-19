@@ -236,7 +236,7 @@ if (realtimeOrders) {
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
                     <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
-                        <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
+                        <iconify-icon icon="solar:chef-hat-bold-duotone"></iconify-icon>
                     </button>
                 </form>
                 <form method="POST" action="${cancelUrl}" data-confirm="Annullare o rifiutare questo ordine? Sara spostato nello storico.">

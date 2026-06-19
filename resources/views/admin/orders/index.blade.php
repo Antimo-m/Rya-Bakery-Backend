@@ -52,7 +52,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
-                                            <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
+                                            <iconify-icon icon="solar:chef-hat-bold-duotone"></iconify-icon>
                                         </button>
                                     </form>
                                 @endif
@@ -62,7 +62,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Completa ordine" title="Completa">
-                                            <iconify-icon icon="solar:like-bold-duotone"></iconify-icon>
+                                            <iconify-icon icon="solar:clipboard-check-bold-duotone"></iconify-icon>
                                         </button>
                                     </form>
                                 @endif

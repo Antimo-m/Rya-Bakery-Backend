@@ -387,6 +387,12 @@
     margin: 0 0 0 auto;
 }
 
+.admin-filters--analysis {
+    grid-template-columns: minmax(150px, 190px) auto auto;
+    gap: 7px;
+    padding: 8px;
+}
+
 .custom-date-field {
     position: relative;
     display: grid;

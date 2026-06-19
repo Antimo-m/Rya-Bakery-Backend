@@ -155,14 +155,28 @@ class OrderController extends Controller
             return back()->withErrors(['order' => 'Accetta l ordine prima di completarlo.']);
         }
 
-        $order->update([
-            'status' => Order::STATUS_DELIVERED,
-            'delivered_at' => now(),
-        ]);
+        DB::transaction(function () use ($order): void {
+            $completedAt = now();
+
+            $order->update([
+                'status' => Order::STATUS_DELIVERED,
+                'delivered_at' => $completedAt,
+            ]);
+
+            $order->histories()->firstOrCreate(
+                [
+                    'reason' => OrderHistory::REASON_DELIVERED,
+                    'restored_at' => null,
+                ],
+                [
+                    'archived_at' => $completedAt,
+                ]
+            );
+        });
 
         $this->broadcastStatus($order->load('items.product'));
 
-        return back()->with('success', 'Ordine pronto e completato. Restera negli ordini attivi per 10 minuti.');
+        return redirect()->route('admin.order-history.index')->with('success', 'Ordine completato e archiviato nello storico.');
     }
 
     public function destroy(Order $order): RedirectResponse

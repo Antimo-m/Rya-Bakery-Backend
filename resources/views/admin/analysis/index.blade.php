@@ -17,7 +17,7 @@
             <span class="admin-kicker">Dettaglio</span>
             <h2>Ordini del giorno selezionato</h2>
         </div>
-        <form class="admin-filters admin-filters--compact admin-filters--inline" method="GET" action="{{ route('admin.analysis.index') }}">
+        <form class="admin-filters admin-filters--compact admin-filters--inline admin-filters--analysis" method="GET" action="{{ route('admin.analysis.index') }}">
             <label>
                 Giorno
                 <span class="custom-date-field">
@@ -25,8 +25,12 @@
                     <input name="day" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" value="{{ $filters['day'] }}">
                 </span>
             </label>
-            <button class="admin-btn" type="submit">Filtra</button>
-            <a class="admin-btn secondary" href="{{ route('admin.analysis.index') }}">Reset</a>
+            <button class="admin-btn admin-btn--icon" type="submit" aria-label="Filtra analisi" title="Filtra">
+                <iconify-icon icon="solar:filter-bold-duotone"></iconify-icon>
+            </button>
+            <a class="admin-btn secondary admin-btn--icon" href="{{ route('admin.analysis.index') }}" aria-label="Reset filtri analisi" title="Reset">
+                <iconify-icon icon="solar:restart-circle-bold-duotone"></iconify-icon>
+            </a>
         </form>
     </section>
 

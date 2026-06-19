@@ -107,6 +107,11 @@
         grid-template-columns: minmax(0, 1fr) auto auto;
     }
 
+    .admin-filters--analysis {
+        width: fit-content;
+        grid-template-columns: minmax(150px, 190px) auto auto;
+    }
+
     .admin-page-header,
     .order-items__header {
         align-items: flex-start;
@@ -204,6 +209,10 @@
         width: fit-content;
     }
 
+    .admin-filters--analysis {
+        grid-template-columns: minmax(150px, 190px) auto auto;
+    }
+
     .admin-table td {
         min-height: 70px;
         font-size: 16px;
@@ -242,6 +251,10 @@
     .admin-filters,
     .admin-filters--compact {
         grid-template-columns: 1fr;
+    }
+
+    .admin-filters--analysis {
+        width: 100%;
     }
 
     .admin-filters .admin-btn {
