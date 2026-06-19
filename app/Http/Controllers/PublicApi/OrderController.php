@@ -104,6 +104,7 @@ class OrderController extends Controller
             'items' => $order->items->map(fn ($item): array => [
                 'product_slug' => $item->product->slug,
                 'product_name' => $item->product->name,
+                'product_image_url' => $item->product->image_url,
                 'quantity' => $item->quantity,
                 'unit_price' => (float) $item->unit_price,
                 'line_total' => (float) $item->line_total,

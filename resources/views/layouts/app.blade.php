@@ -10,14 +10,18 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800|fraunces:600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/scss/admin.scss', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased admin-body">
         <div class="admin-shell">
-            <aside class="admin-sidebar">
+            <button class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Apri menu" data-admin-menu-toggle>
+                <iconify-icon icon="solar:hamburger-menu-bold-duotone"></iconify-icon>
+            </button>
+            <button class="admin-sidebar-backdrop" type="button" aria-label="Chiudi menu" data-admin-menu-close></button>
+            <aside class="admin-sidebar" id="admin-sidebar">
                 <a class="admin-brand" href="{{ route('admin.dashboard') }}">
                     <span class="admin-brand-mark">R</span>
                     <span>
@@ -78,7 +82,10 @@
                 <p data-confirm-message>Vuoi continuare?</p>
                 <div class="confirm-dialog__actions">
                     <button class="admin-btn secondary" type="button" data-confirm-cancel>Annulla</button>
-                    <button class="admin-btn danger" type="button" data-confirm-submit>Conferma</button>
+                    <button class="admin-btn success" type="button" data-confirm-submit>
+                        <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                        Conferma
+                    </button>
                 </div>
             </form>
         </dialog>

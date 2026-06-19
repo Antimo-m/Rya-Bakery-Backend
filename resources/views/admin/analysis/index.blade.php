@@ -6,21 +6,8 @@
         </div>
     </x-slot>
 
-    <form class="admin-filters" method="GET" action="{{ route('admin.analysis.index') }}">
-        <label>
-            Giorno
-            <input name="day" type="date" value="{{ $filters['day'] }}">
-        </label>
-        <label>
-            Mese
-            <input name="month" type="month" value="{{ $filters['month'] }}">
-        </label>
-        <button class="admin-btn" type="submit">Aggiorna</button>
-        <a class="admin-btn secondary" href="{{ route('admin.analysis.index') }}">Oggi</a>
-    </form>
-
     <section class="admin-grid stats-grid">
-        <article class="admin-card"><span>Incasso oggi</span><strong>€ {{ number_format($todayTotal, 2, ',', '.') }}</strong><em>ordini completati</em></article>
+        <article class="admin-card"><span>Incasso Giornaliero</span><strong>€ {{ number_format($todayTotal, 2, ',', '.') }}</strong><em>ordini completati</em></article>
         <article class="admin-card"><span>Giorno selezionato</span><strong>€ {{ number_format($dayTotal, 2, ',', '.') }}</strong><em>{{ \Illuminate\Support\Carbon::parse($filters['day'])->format('d/m/Y') }}</em></article>
         <article class="admin-card"><span>Mese selezionato</span><strong>€ {{ number_format($monthTotal, 2, ',', '.') }}</strong><em>{{ $monthOrdersCount }} ordini completati</em></article>
     </section>
@@ -30,6 +17,17 @@
             <span class="admin-kicker">Dettaglio</span>
             <h2>Ordini del giorno selezionato</h2>
         </div>
+        <form class="admin-filters admin-filters--compact admin-filters--inline" method="GET" action="{{ route('admin.analysis.index') }}">
+            <label>
+                Giorno
+                <span class="custom-date-field">
+                    <iconify-icon icon="solar:calendar-date-bold-duotone"></iconify-icon>
+                    <input name="day" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" value="{{ $filters['day'] }}">
+                </span>
+            </label>
+            <button class="admin-btn" type="submit">Filtra</button>
+            <a class="admin-btn secondary" href="{{ route('admin.analysis.index') }}">Reset</a>
+        </form>
     </section>
 
     <section class="admin-table-wrap">
@@ -49,7 +47,16 @@
                             <strong>{{ $order->customer_name }}</strong><br>
                             <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
                         </td>
-                        <td>{{ $order->items->pluck('product.name')->join(', ') }}</td>
+                        <td>
+                            <div class="admin-product-stack">
+                                @foreach ($order->items as $item)
+                                    <span class="admin-product-chip">
+                                        <img src="{{ $item->product->image_url }}" alt="">
+                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
+                                    </span>
+                                @endforeach
+                            </div>
+                        </td>
                         <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
                         <td>{{ $order->delivered_at?->format('d/m/Y H:i') }}</td>
                     </tr>

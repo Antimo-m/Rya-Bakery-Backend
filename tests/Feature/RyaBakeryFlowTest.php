@@ -70,6 +70,7 @@ class RyaBakeryFlowTest extends TestCase
             ->assertJsonPath('order.customer_name', 'Naomi')
             ->assertJsonPath('order.table_number', 4)
             ->assertJsonPath('order.items.0.product_slug', 'cappuccino-rya')
+            ->assertJsonPath('order.items.0.product_image_url', $product->image_url)
             ->assertJsonPath('order.total_price', 4.4);
 
         $this->assertDatabaseHas('orders', [
@@ -239,6 +240,21 @@ class RyaBakeryFlowTest extends TestCase
         $this->getJson(route('api.products.show', $product))
             ->assertOk()
             ->assertJsonPath('product.image_url', $product->image_url);
+    }
+
+    public function test_product_api_uses_placeholder_when_stored_image_is_missing(): void
+    {
+        Storage::fake('public');
+
+        $product = Product::factory()->create([
+            'slug' => 'immagine-mancante',
+            'image_path' => 'products/missing.jpg',
+            'is_active' => true,
+        ]);
+
+        $this->getJson(route('api.products.show', $product))
+            ->assertOk()
+            ->assertJsonPath('product.image_url', asset('images/rya-product-placeholder.svg'));
     }
 
     public function test_admin_can_accept_and_cancel_orders(): void

@@ -4,7 +4,9 @@
             <span class="admin-kicker">Archivio operativo</span>
             <h1>Storico ordini</h1>
         </div>
-        <a class="admin-btn secondary" href="{{ route('admin.order-history.export', request()->query()) }}">Esporta CSV</a>
+        <a class="admin-btn secondary admin-btn--icon" href="{{ route('admin.order-history.export', request()->query()) }}" aria-label="Esporta CSV" title="Esporta CSV">
+            <iconify-icon icon="solar:download-square-bold-duotone"></iconify-icon>
+        </a>
     </x-slot>
 
     <form class="admin-filters" method="GET" action="{{ route('admin.order-history.index') }}">
@@ -22,11 +24,17 @@
         </label>
         <label>
             Da
-            <input name="from" type="date" value="{{ $filters['from'] ?? '' }}">
+            <span class="custom-date-field">
+                <iconify-icon icon="solar:calendar-date-bold-duotone"></iconify-icon>
+                <input name="from" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" value="{{ $filters['from'] ?? '' }}">
+            </span>
         </label>
         <label>
             A
-            <input name="to" type="date" value="{{ $filters['to'] ?? '' }}">
+            <span class="custom-date-field">
+                <iconify-icon icon="solar:calendar-date-bold-duotone"></iconify-icon>
+                <input name="to" type="text" inputmode="numeric" pattern="\d{4}-\d{2}-\d{2}" placeholder="YYYY-MM-DD" value="{{ $filters['to'] ?? '' }}">
+            </span>
         </label>
         <button class="admin-btn" type="submit">Filtra</button>
         <a class="admin-btn secondary" href="{{ route('admin.order-history.index') }}">Reset</a>
@@ -52,9 +60,14 @@
                             <small>Tavolo {{ $history->order->table_number }} · {{ $history->order->slug }}</small>
                         </td>
                         <td>
+                            <div class="admin-product-stack">
                             @foreach ($history->order->items as $item)
-                                {{ $item->quantity }}x {{ $item->product->name }}<br>
+                                <span class="admin-product-chip">
+                                    <img src="{{ $item->product->image_url }}" alt="">
+                                    <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
+                                </span>
                             @endforeach
+                            </div>
                         </td>
                         <td><span class="badge {{ $history->reason }}">{{ $history->reasonLabel() }}</span></td>
                         <td>
@@ -70,7 +83,9 @@
                                 <form method="POST" action="{{ route('admin.order-history.restore', $history->order) }}" data-confirm="Ripristinare questo ordine negli ordini attivi?">
                                     @csrf
                                     @method('PATCH')
-                                    <button class="admin-btn success" type="submit">Ripristina</button>
+                                    <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Ripristina ordine" title="Ripristina">
+                                        <iconify-icon icon="solar:restart-circle-bold-duotone"></iconify-icon>
+                                    </button>
                                 </form>
                             @else
                                 <span class="badge off">Non ripristinabile</span>

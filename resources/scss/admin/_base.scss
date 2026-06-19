@@ -4,6 +4,7 @@
         radial-gradient(circle at 16% 0%, rgba(239, 189, 115, .16), transparent 30%),
         linear-gradient(180deg, #fbf8f3 0%, var(--rya-bg) 48%, #eee5da 100%);
     color: var(--rya-ink);
+    font-family: Figtree, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .admin-body * {
@@ -19,4 +20,11 @@
 .admin-body select,
 .admin-body textarea {
     font: inherit;
+}
+
+.admin-body h1,
+.admin-body h2,
+.admin-brand strong {
+    font-family: Fraunces, Georgia, serif;
+    letter-spacing: 0;
 }

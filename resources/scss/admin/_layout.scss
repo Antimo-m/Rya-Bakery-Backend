@@ -4,6 +4,11 @@
     grid-template-columns: 276px minmax(0, 1fr);
 }
 
+.admin-menu-toggle,
+.admin-sidebar-backdrop {
+    display: none;
+}
+
 .admin-sidebar {
     position: sticky;
     top: 0;
@@ -151,8 +156,9 @@
 
     h1 {
         margin: 0;
-        font-size: 34px;
-        font-weight: 850;
+        font-size: clamp(32px, 4vw, 44px);
+        font-weight: 700;
         letter-spacing: 0;
+        line-height: .96;
     }
 }

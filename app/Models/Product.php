@@ -37,7 +37,7 @@ class Product extends Model
 
     protected function imageUrl(): Attribute
     {
-        return Attribute::get(fn (): string => $this->image_path
+        return Attribute::get(fn (): string => $this->image_path && Storage::disk('public')->exists($this->image_path)
             ? asset(Storage::url($this->image_path))
             : asset('images/rya-product-placeholder.svg'));
     }

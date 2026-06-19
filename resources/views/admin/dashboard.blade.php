@@ -32,7 +32,9 @@
             <span class="admin-kicker">Ultimi movimenti</span>
             <h2>Ordini recenti</h2>
         </div>
-        <a class="admin-btn secondary" href="{{ route('admin.orders.index') }}">Vedi ordini</a>
+        <a class="admin-btn secondary admin-btn--icon" href="{{ route('admin.orders.index') }}" aria-label="Vedi ordini" title="Vedi ordini">
+            <iconify-icon icon="solar:arrow-right-up-bold-duotone"></iconify-icon>
+        </a>
     </section>
 
     <section class="admin-table-wrap">
@@ -51,7 +53,14 @@
                     <tr>
                         <td>
                             <strong>{{ $order->customer_name }}</strong><br>
-                            {{ $order->items->pluck('product.name')->join(', ') }}
+                            <div class="admin-product-stack">
+                                @foreach ($order->items as $item)
+                                    <span class="admin-product-chip">
+                                        <img src="{{ $item->product->image_url }}" alt="">
+                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
+                                    </span>
+                                @endforeach
+                            </div>
                         </td>
                         <td>{{ $order->table_number }}</td>
                         <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
