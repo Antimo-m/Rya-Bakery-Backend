@@ -4,8 +4,12 @@
     grid-template-columns: 276px minmax(0, 1fr);
 }
 
-.admin-menu-toggle,
+.admin-mobile-bar,
 .admin-sidebar-backdrop {
+    display: none;
+}
+
+.admin-menu-toggle {
     display: none;
 }
 

@@ -14,7 +14,6 @@
         data-edit-url-template="{{ route('admin.orders.edit', ['order' => '__SLUG__']) }}"
         data-live-url="{{ route('admin.orders.live') }}"
     >
-        <div class="admin-live-status" data-orders-live-status role="status" aria-live="polite"></div>
         <table class="admin-table">
             <thead>
                 <tr>
@@ -34,13 +33,34 @@
                             <small>Tavolo {{ $order->table_number }} · {{ $order->slug }}</small>
                         </td>
                         <td>
-                            <div class="admin-product-stack">
-                            @foreach ($order->items as $item)
-                                <span class="admin-product-chip">
-                                    <img src="{{ $item->product->image_url }}" alt="">
-                                    <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                </span>
-                            @endforeach
+                            <div class="admin-product-stack" data-order-products>
+                                @php
+                                    $orderItems = $order->items;
+                                    $hasManyProducts = $orderItems->count() > 4;
+                                @endphp
+
+                                @foreach ($hasManyProducts ? $orderItems->take(1) : $orderItems as $item)
+                                    <span class="admin-product-chip">
+                                        <img src="{{ $item->product->image_url }}" alt="">
+                                        <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
+                                    </span>
+                                @endforeach
+
+                                @if ($hasManyProducts)
+                                    <div class="admin-product-stack__extra" data-order-products-extra hidden>
+                                        @foreach ($orderItems->skip(1) as $item)
+                                            <span class="admin-product-chip">
+                                                <img src="{{ $item->product->image_url }}" alt="">
+                                                <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
+                                            </span>
+                                        @endforeach
+                                    </div>
+
+                                    <button class="admin-products-toggle" type="button" data-order-products-toggle aria-expanded="false">
+                                        <iconify-icon icon="solar:menu-dots-bold"></iconify-icon>
+                                        <span data-toggle-label>+{{ $orderItems->count() - 1 }} altri prodotti</span>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                         <td>€ {{ number_format($order->total_price, 2, ',', '.') }}</td>
@@ -53,7 +73,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
-                                            <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                                            <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
                                         </button>
                                     </form>
                                 @endif
@@ -63,7 +83,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Completa ordine" title="Completa">
-                                            <iconify-icon icon="solar:check-read-bold-duotone"></iconify-icon>
+                                            <iconify-icon icon="solar:like-bold-duotone"></iconify-icon>
                                         </button>
                                     </form>
                                 @endif
@@ -73,13 +93,13 @@
                                         @csrf
                                         @method('PATCH')
                                         <button class="admin-btn danger admin-btn--icon" type="submit" aria-label="Annulla ordine" title="Annulla">
-                                            <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                                            <iconify-icon icon="solar:close-square-bold-duotone"></iconify-icon>
                                         </button>
                                     </form>
                                 @endif
 
                                 <a class="admin-btn edit admin-btn--icon" href="{{ route('admin.orders.edit', $order) }}" aria-label="Modifica ordine" title="Modifica">
-                                    <iconify-icon icon="solar:pen-new-square-bold-duotone"></iconify-icon>
+                                    <iconify-icon icon="solar:pen-2-bold-duotone"></iconify-icon>
                                 </a>
                             </div>
                         </td>

@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ $title ?? 'Rya Bakery Admin' }}</title>
-        <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+        <link rel="icon" type="image/png" href="{{ asset('RyaBakery.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -17,9 +17,12 @@
     </head>
     <body class="font-sans antialiased admin-body">
         <div class="admin-shell">
-            <button class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Apri menu" data-admin-menu-toggle>
-                <iconify-icon icon="solar:hamburger-menu-bold-duotone"></iconify-icon>
-            </button>
+            <header class="admin-mobile-bar">
+                <a class="admin-mobile-brand" href="{{ route('admin.dashboard') }}">Rya Bakery & Café</a>
+                <button class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Apri menu" title="Apri menu" data-admin-menu-toggle>
+                    <iconify-icon icon="solar:hamburger-menu-linear"></iconify-icon>
+                </button>
+            </header>
             <button class="admin-sidebar-backdrop" type="button" aria-label="Chiudi menu" data-admin-menu-close></button>
             <aside class="admin-sidebar" id="admin-sidebar">
                 <a class="admin-brand" href="{{ route('admin.dashboard') }}">
@@ -36,6 +39,7 @@
                     <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><iconify-icon icon="solar:donut-bitten-bold-duotone"></iconify-icon> Prodotti</a>
                     <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini</a>
                     <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><iconify-icon icon="solar:archive-bold-duotone"></iconify-icon> Storico ordini</a>
+                    <a class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" href="{{ route('admin.settings.edit') }}"><iconify-icon icon="solar:settings-bold-duotone"></iconify-icon> Impostazioni</a>
                 </nav>
 
                 <div class="admin-user">
@@ -81,9 +85,12 @@
                 <h2 data-confirm-title>Conferma azione</h2>
                 <p data-confirm-message>Vuoi continuare?</p>
                 <div class="confirm-dialog__actions">
-                    <button class="admin-btn secondary" type="button" data-confirm-cancel>Annulla</button>
+                    <button class="admin-btn secondary" type="button" data-confirm-cancel>
+                        <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+                        Annulla
+                    </button>
                     <button class="admin-btn success" type="button" data-confirm-submit>
-                        <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                        <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
                         Conferma
                     </button>
                 </div>

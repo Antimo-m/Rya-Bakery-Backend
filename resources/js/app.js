@@ -198,7 +198,6 @@ if (realtimeOrders) {
     const table = realtimeOrders.querySelector('.admin-table');
     const tbody = realtimeOrders.querySelector('[data-orders-table-body]');
     const emptyRow = realtimeOrders.querySelector('[data-orders-empty-row]');
-    const liveStatus = realtimeOrders.querySelector('[data-orders-live-status]');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const euroFormatter = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
     const dateFormatter = new Intl.DateTimeFormat('it-IT', {
@@ -208,16 +207,6 @@ if (realtimeOrders) {
         hour: '2-digit',
         minute: '2-digit',
     });
-
-    const setLiveStatus = (message, state = 'info') => {
-        if (!liveStatus) {
-            return;
-        }
-
-        liveStatus.textContent = message;
-        liveStatus.dataset.state = state;
-        liveStatus.classList.add('is-visible');
-    };
 
     const fillTemplate = (template, slug) => template.replace('__SLUG__', encodeURIComponent(slug));
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -239,33 +228,79 @@ if (realtimeOrders) {
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
                     <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
-                        <iconify-icon icon="solar:check-circle-bold-duotone"></iconify-icon>
+                        <iconify-icon icon="solar:check-square-bold-duotone"></iconify-icon>
                     </button>
                 </form>
                 <form method="POST" action="${cancelUrl}" data-confirm="Annullare o rifiutare questo ordine? Sara spostato nello storico.">
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
                     <button class="admin-btn danger admin-btn--icon" type="submit" aria-label="Annulla ordine" title="Annulla">
-                        <iconify-icon icon="solar:trash-bin-trash-bold-duotone"></iconify-icon>
+                        <iconify-icon icon="solar:close-square-bold-duotone"></iconify-icon>
                     </button>
                 </form>
                 <a class="admin-btn edit admin-btn--icon" href="${editUrl}" aria-label="Modifica ordine" title="Modifica">
-                    <iconify-icon icon="solar:pen-new-square-bold-duotone"></iconify-icon>
+                    <iconify-icon icon="solar:pen-2-bold-duotone"></iconify-icon>
                 </a>
             </div>
         `;
     };
 
-    const orderProducts = (order) => `
-        <div class="admin-product-stack">
-            ${(order.items || []).map((item) => `
-                <span class="admin-product-chip">
-                    <img src="${escapeHtml(item.product?.image_url || '')}" alt="">
-                    <span>${escapeHtml(item.quantity)}x ${escapeHtml(item.product?.name || 'Prodotto')}</span>
-                </span>
-            `).join('')}
-        </div>
+    const productChip = (item) => `
+        <span class="admin-product-chip">
+            <img src="${escapeHtml(item.product?.image_url || '')}" alt="">
+            <span>${escapeHtml(item.quantity)}x ${escapeHtml(item.product?.name || 'Prodotto')}</span>
+        </span>
     `;
+
+    const orderProducts = (order) => {
+        const items = order.items || [];
+
+        if (items.length <= 4) {
+            return `
+                <div class="admin-product-stack" data-order-products>
+                    ${items.map(productChip).join('')}
+                </div>
+            `;
+        }
+
+        return `
+            <div class="admin-product-stack" data-order-products>
+                ${productChip(items[0])}
+                <div class="admin-product-stack__extra" data-order-products-extra hidden>
+                    ${items.slice(1).map(productChip).join('')}
+                </div>
+                <button class="admin-products-toggle" type="button" data-order-products-toggle aria-expanded="false">
+                    <iconify-icon icon="solar:menu-dots-bold"></iconify-icon>
+                    <span data-toggle-label>+${items.length - 1} altri prodotti</span>
+                </button>
+            </div>
+        `;
+    };
+
+    const expandedOrderProducts = (container) => (
+        Array.from(container.querySelectorAll('.admin-product-chip')).length
+    );
+
+    document.addEventListener('click', (event) => {
+        const toggle = event.target.closest('[data-order-products-toggle]');
+
+        if (!toggle) {
+            return;
+        }
+
+        const stack = toggle.closest('[data-order-products]');
+        const extra = stack?.querySelector('[data-order-products-extra]');
+        const label = toggle.querySelector('[data-toggle-label]');
+
+        if (!extra || !label) {
+            return;
+        }
+
+        const willOpen = extra.hidden;
+        extra.hidden = !willOpen;
+        toggle.setAttribute('aria-expanded', String(willOpen));
+        label.textContent = willOpen ? 'Mostra meno' : `+${expandedOrderProducts(extra)} altri prodotti`;
+    });
 
     const orderRow = (order) => {
         const row = document.createElement('tr');
@@ -326,47 +361,24 @@ if (realtimeOrders) {
 
             missingOrders.reverse().forEach((order) => prependOrder(order));
 
-            if (missingOrders.length > 0) {
-                setLiveStatus(`${missingOrders.length} ordini recuperati e sincronizzati.`, 'success');
-            }
         } catch {
-            setLiveStatus('Realtime connesso, ma non riesco a sincronizzare gli ordini mancanti.', 'warning');
+            // Keep realtime recovery silent: orders still arrive through the WebSocket.
         }
     };
 
     echo.connector.pusher.connection.bind('state_change', ({ current }) => {
         if (current === 'connected') {
-            setLiveStatus('Realtime connesso: i nuovi ordini appariranno automaticamente.', 'success');
             syncMissingOrders();
-            return;
         }
-
-        if (['connecting', 'unavailable'].includes(current)) {
-            setLiveStatus('Realtime in connessione: controllo nuovi ordini in corso.', 'warning');
-            return;
-        }
-
-        if (['failed', 'disconnected'].includes(current)) {
-            setLiveStatus('Realtime non connesso: avvia php artisan reverb:start e ricarica la pagina.', 'error');
-        }
-    });
-
-    echo.connector.pusher.connection.bind('error', () => {
-        setLiveStatus('Realtime non connesso: verifica che Reverb sia avviato e raggiungibile da questo dispositivo.', 'error');
     });
 
     echo.channel('orders')
         .subscribed(() => {
-            setLiveStatus('Realtime connesso: i nuovi ordini appariranno automaticamente.', 'success');
             syncMissingOrders();
         })
         .listen('.order.created', (event) => {
         if (!prependOrder(event.order)) {
             return;
-        }
-
-        if (liveStatus) {
-            setLiveStatus(`Nuovo ordine ricevuto: ${event.order.customer_name}, tavolo ${event.order.table_number}.`, 'success');
         }
     });
 }

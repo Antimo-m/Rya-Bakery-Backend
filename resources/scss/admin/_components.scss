@@ -15,33 +15,6 @@
     }
 }
 
-.admin-live-status {
-    display: none;
-    margin: 0 0 14px;
-    padding: 12px 14px;
-    border: 1px solid rgba(22, 101, 52, .18);
-    border-radius: var(--rya-radius-md);
-    background: #dcf3ea;
-    color: #174c3b;
-    font-weight: 850;
-
-    &.is-visible {
-        display: block;
-    }
-
-    &[data-state="warning"] {
-        border-color: rgba(180, 83, 9, .22);
-        background: #fff2d9;
-        color: #7c3d12;
-    }
-
-    &[data-state="error"] {
-        border-color: rgba(185, 28, 28, .22);
-        background: #ffe3df;
-        color: #7a2420;
-    }
-}
-
 .admin-grid {
     display: grid;
     gap: 16px;
@@ -144,8 +117,8 @@
     }
 
     &.edit {
-        color: #fff;
-        background: #2563eb;
+        color: #17405c;
+        background: #dbeeff;
     }
 
     &.danger {
@@ -173,78 +146,37 @@
 }
 
 .admin-btn--icon-primary {
-    width: 46px;
-    min-width: 46px;
-    height: 46px;
-    min-height: 46px;
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
     padding: 0;
-    border-radius: 16px;
-    color: #fffaf4;
-    background: linear-gradient(135deg, var(--rya-green), var(--rya-sidebar));
-    box-shadow: 0 16px 34px rgba(17, 112, 92, .24);
+    border-color: rgba(183, 95, 50, .20);
+    border-radius: 50%;
+    color: var(--rya-accent);
+    background: rgba(255, 250, 245, .82);
+    box-shadow: 0 14px 30px rgba(37, 25, 23, .08);
 
     iconify-icon {
-        width: 24px;
-        min-width: 24px;
-        font-size: 24px;
+        width: 25px;
+        min-width: 25px;
+        font-size: 25px;
     }
 
     &:hover {
         transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 20px 42px rgba(17, 112, 92, .32);
+        color: #fff;
+        background: var(--rya-accent);
+        box-shadow: 0 18px 38px rgba(183, 95, 50, .22);
     }
 }
 
 .admin-products-footer {
-    display: flex;
+    display: grid;
+    place-items: center;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
     margin-top: 18px;
-    padding: 14px;
-    border: 1px solid var(--rya-line);
-    border-radius: var(--rya-radius-xl);
-    background:
-        linear-gradient(135deg, rgba(183, 95, 50, .08), transparent 44%),
-        var(--rya-panel-strong);
-    box-shadow: 0 14px 34px rgba(37, 25, 23, .07);
-}
-
-.admin-products-count {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-
-    > iconify-icon {
-        display: grid;
-        place-items: center;
-        width: 42px;
-        min-width: 42px;
-        height: 42px;
-        border-radius: 14px;
-        color: var(--rya-accent);
-        background: rgba(183, 95, 50, .10);
-        font-size: 22px;
-    }
-
-    strong,
-    span {
-        display: block;
-    }
-
-    strong {
-        color: var(--rya-ink);
-        font-size: 14px;
-        font-weight: 900;
-    }
-
-    span {
-        margin-top: 2px;
-        color: var(--rya-muted);
-        font-size: 12px;
-        font-weight: 800;
-    }
+    padding: 4px 0;
 }
 
 .admin-pagination {
@@ -252,11 +184,16 @@
     align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--rya-line);
+    border-radius: 999px;
+    background: rgba(255, 250, 245, .86);
+    box-shadow: 0 12px 28px rgba(37, 25, 23, .07);
 }
 
 .admin-pagination__button,
-.admin-pagination__page,
+.admin-pagination__summary,
 .admin-pagination__ellipsis {
     display: inline-grid;
     place-items: center;
@@ -272,6 +209,14 @@
     transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
 }
 
+.admin-pagination__summary {
+    min-width: auto;
+    padding: 0 10px;
+    border-color: transparent;
+    background: transparent;
+    color: var(--rya-soft-ink);
+}
+
 .admin-pagination__button {
     color: var(--rya-accent);
     background: #fff5e8;
@@ -282,19 +227,12 @@
     }
 }
 
-.admin-pagination__page:hover,
 .admin-pagination__button:hover {
     transform: translateY(-1px);
     box-shadow: 0 10px 22px rgba(37, 25, 23, .10);
 }
 
 .admin-pagination__button:hover {
-    color: #fff;
-    background: var(--rya-accent);
-    border-color: var(--rya-accent);
-}
-
-.admin-pagination__page.is-current {
     color: #fff;
     background: var(--rya-accent);
     border-color: var(--rya-accent);
