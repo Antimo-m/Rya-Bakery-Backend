@@ -47,12 +47,12 @@ class OrderHistoryController extends Controller
                 ->chunk(500, function ($histories) use ($handle): void {
                     foreach ($histories as $history) {
                         fputcsv($handle, [
-                            $history->order->slug,
-                            $history->order->customer_name,
-                            $history->order->table_number,
-                            $history->reasonLabel(),
-                            $history->order->total_price,
-                            $history->archived_at?->format('Y-m-d H:i:s'),
+                            $this->csvCell($history->order->slug),
+                            $this->csvCell($history->order->customer_name),
+                            $this->csvCell($history->order->table_number),
+                            $this->csvCell($history->reasonLabel()),
+                            $this->csvCell($history->order->total_price),
+                            $this->csvCell($history->archived_at?->format('Y-m-d H:i:s')),
                         ]);
                     }
                 });
@@ -118,5 +118,12 @@ class OrderHistoryController extends Controller
                         ->orWhere('table_number', $search);
                 });
             });
+    }
+
+    private function csvCell(mixed $value): string
+    {
+        $value = (string) $value;
+
+        return preg_match('/^[=\-+@]/', $value) === 1 ? "'".$value : $value;
     }
 }
