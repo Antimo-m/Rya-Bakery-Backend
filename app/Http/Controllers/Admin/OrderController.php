@@ -122,7 +122,7 @@ class OrderController extends Controller
 
         $this->broadcastStatus($order->load('items.product'));
 
-        return back()->with('success', 'Ordine preso in preparazione.');
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine preso in preparazione.');
     }
 
     public function cancel(Order $order): RedirectResponse
@@ -146,7 +146,7 @@ class OrderController extends Controller
 
         $this->broadcastStatus($order->load('items.product'));
 
-        return redirect()->route('admin.order-history.index')->with('success', 'Ordine annullato e spostato nello storico.');
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine annullato e archiviato nello storico.');
     }
 
     public function complete(Order $order): RedirectResponse
@@ -176,7 +176,7 @@ class OrderController extends Controller
 
         $this->broadcastStatus($order->load('items.product'));
 
-        return redirect()->route('admin.order-history.index')->with('success', 'Ordine completato e archiviato nello storico.');
+        return redirect()->route('admin.orders.index')->with('success', 'Ordine pronto per il ritiro e cliente avvisato.');
     }
 
     public function destroy(Order $order): RedirectResponse

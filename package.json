@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@fontsource/lora": "^5.2.8",
-        "iconify-icon": "^3.0.2",
+        "bootstrap-icons": "^1.13.1",
         "laravel-echo": "^2.3.7",
         "pusher-js": "^8.5.0"
     }

@@ -11,6 +11,14 @@
     box-sizing: border-box;
 }
 
+.admin-body .bi {
+    display: inline-block;
+    flex: 0 0 auto;
+    font-style: normal;
+    line-height: 1;
+    vertical-align: -.125em;
+}
+
 .admin-body a {
     color: inherit;
 }

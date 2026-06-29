@@ -78,7 +78,7 @@ class OrderController extends Controller
         }
 
         return response()->json([
-            'message' => 'Ordine inviato al banco. Lo staff lo prendera in preparazione.',
+            'message' => 'Ordine inviato al banco. Ti avviseremo quando sarà pronto per il ritiro.',
             'order' => $this->payload($order),
         ], 201);
     }
@@ -107,6 +107,7 @@ class OrderController extends Controller
             'table_number' => $order->table_number,
             'status' => $order->status,
             'status_label' => $order->statusLabel(),
+            'pickup_message' => $order->pickupMessage(),
             'total_price' => (float) $order->total_price,
             'created_at' => $order->created_at?->toIso8601String(),
             'items' => $order->items->map(fn ($item): array => [

@@ -18,6 +18,7 @@ class ProductCatalogController extends Controller
         $query = Product::query()
             ->where('is_active', true)
             ->when($request->filled('category'), fn ($query) => $query->where('category', (string) $request->string('category')))
+            ->orderByDesc('is_available')
             ->orderBy('category')
             ->orderBy('name');
 
@@ -73,6 +74,7 @@ class ProductCatalogController extends Controller
             ])
             ->joinSub($orderStats, 'order_stats', 'order_stats.product_id', '=', 'products.id')
             ->where('products.is_active', true)
+            ->orderByDesc('products.is_available')
             ->orderByDesc('orders_count')
             ->orderByDesc('ordered_quantity')
             ->orderBy('products.name')

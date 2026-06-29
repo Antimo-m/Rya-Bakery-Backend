@@ -41,7 +41,7 @@ class OrderHistory extends Model
     {
         return match ($this->reason) {
             self::REASON_CANCELLED => 'Annullato',
-            self::REASON_DELIVERED => 'Consegnato',
+            self::REASON_DELIVERED => 'Pronto per il ritiro',
             default => $this->reason,
         };
     }

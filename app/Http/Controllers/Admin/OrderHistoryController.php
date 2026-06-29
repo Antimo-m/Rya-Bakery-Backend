@@ -40,7 +40,7 @@ class OrderHistoryController extends Controller
 
         return response()->streamDownload(function () use ($filters): void {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Ordine', 'Cliente', 'Tavolo', 'Motivo', 'Totale', 'Archiviato']);
+            fputcsv($handle, ['Ordine', 'Cliente', 'Tavolo', 'Stato ordine', 'Totale', 'Data ordine', 'Archiviato']);
 
             $this->historyQuery($filters)
                 ->latest('archived_at')
@@ -50,8 +50,9 @@ class OrderHistoryController extends Controller
                             $this->csvCell($history->order->slug),
                             $this->csvCell($history->order->customer_name),
                             $this->csvCell($history->order->table_number),
-                            $this->csvCell($history->reasonLabel()),
+                            $this->csvCell($history->order->statusLabel()),
                             $this->csvCell($history->order->total_price),
+                            $this->csvCell($history->order->created_at?->format('Y-m-d H:i:s')),
                             $this->csvCell($history->archived_at?->format('Y-m-d H:i:s')),
                         ]);
                     }
@@ -59,6 +60,23 @@ class OrderHistoryController extends Controller
 
             fclose($handle);
         }, $fileName, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function report(Request $request): View
+    {
+        $filters = $this->validatedFilters($request);
+
+        Order::archiveDeliveredOrders();
+
+        return view('admin.order-history.report', [
+            'title' => 'Rya Bakery Admin | Report storico ordini',
+            'histories' => $this->historyQuery($filters)
+                ->latest('archived_at')
+                ->limit(250)
+                ->get(),
+            'filters' => $filters,
+            'generatedAt' => now(),
+        ]);
     }
 
     public function restore(Order $order): RedirectResponse
@@ -75,6 +93,7 @@ class OrderHistoryController extends Controller
 
         $order->update([
             'status' => Order::STATUS_RECEIVED,
+            'accepted_at' => null,
             'cancelled_at' => null,
             'delivered_at' => null,
         ]);
@@ -94,7 +113,7 @@ class OrderHistoryController extends Controller
     {
         return $request->validate([
             'search' => ['nullable', 'string', 'max:120'],
-            'reason' => ['nullable', 'string', 'in:'.implode(',', [OrderHistory::REASON_CANCELLED, OrderHistory::REASON_DELIVERED])],
+            'status' => ['nullable', 'string', 'in:'.implode(',', [Order::STATUS_CANCELLED, Order::STATUS_DELIVERED])],
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
         ]);
@@ -105,7 +124,9 @@ class OrderHistoryController extends Controller
         return OrderHistory::query()
             ->with('order.items.product')
             ->whereNull('restored_at')
-            ->when($filters['reason'] ?? null, fn ($query, $reason) => $query->where('reason', $reason))
+            ->when($filters['status'] ?? null, function ($query, string $status): void {
+                $query->whereHas('order', fn ($orderQuery) => $orderQuery->where('status', $status));
+            })
             ->when($filters['from'] ?? null, fn ($query, $from) => $query->whereDate('archived_at', '>=', $from))
             ->when($filters['to'] ?? null, fn ($query, $to) => $query->whereDate('archived_at', '<=', $to))
             ->when($filters['search'] ?? null, function ($query, string $search): void {

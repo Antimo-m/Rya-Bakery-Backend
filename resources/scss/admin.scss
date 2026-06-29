@@ -1,8 +1,9 @@
+@use 'bootstrap-icons/font/bootstrap-icons.css';
 @use 'admin/variables';
 @use 'admin/base';
 @use 'admin/auth';
 @use 'admin/layout';
 @use 'admin/components';
-@use 'admin/tables';
+@use 'admin/collections';
 @use 'admin/forms';
 @use 'admin/responsive';

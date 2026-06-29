@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminChecklistItem;
 use App\Models\Order;
 use App\Models\OrderHistory;
 use App\Models\Product;
@@ -50,17 +51,47 @@ class RyaBakeryFlowTest extends TestCase
             ->assertJsonPath('categories.1', 'Salato');
     }
 
+    public function test_public_catalog_puts_unavailable_products_after_available_products_across_pages(): void
+    {
+        Product::factory()->create([
+            'name' => 'A non disponibile',
+            'slug' => 'a-non-disponibile',
+            'category' => 'Dolci',
+            'is_active' => true,
+            'is_available' => false,
+        ]);
+        Product::factory()->create([
+            'name' => 'Z disponibile',
+            'slug' => 'z-disponibile',
+            'category' => 'Dolci',
+            'is_active' => true,
+            'is_available' => true,
+        ]);
+
+        $this->getJson('/api/products?per_page=1&page=1')
+            ->assertOk()
+            ->assertJsonPath('products.0.slug', 'z-disponibile')
+            ->assertJsonPath('products.0.is_available', true);
+
+        $this->getJson('/api/products?per_page=1&page=2')
+            ->assertOk()
+            ->assertJsonPath('products.0.slug', 'a-non-disponibile')
+            ->assertJsonPath('products.0.is_available', false);
+    }
+
     public function test_public_catalog_returns_most_ordered_products(): void
     {
         $popular = Product::factory()->create([
             'name' => 'Coca Cola',
             'slug' => 'coca-cola',
             'is_active' => true,
+            'is_available' => true,
         ]);
         $lessPopular = Product::factory()->create([
             'name' => 'Cornetto',
             'slug' => 'cornetto',
             'is_active' => true,
+            'is_available' => true,
         ]);
 
         foreach (range(1, 3) as $index) {
@@ -184,7 +215,7 @@ class RyaBakeryFlowTest extends TestCase
             ->assertSee('Cliente Test')
             ->assertSee('Tavolo')
             ->assertSee('ordine-test')
-            ->assertSee('>7<', false)
+            ->assertSee('Tavolo 7')
             ->assertSee('Cornetto');
     }
 
@@ -228,7 +259,90 @@ class RyaBakeryFlowTest extends TestCase
             ->assertOk()
             ->assertSee('€ 12,50')
             ->assertSee('Cliente Analisi')
+            ->assertSee('value="2026-06-10" readonly data-submit-on-select', false)
             ->assertDontSee('€ 99,00');
+    }
+
+    public function test_hourly_revenue_chart_lives_in_analysis_not_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Incasso per fascia oraria');
+
+        $this->actingAs($user)
+            ->get(route('admin.analysis.index'))
+            ->assertOk()
+            ->assertSee('Incasso per fascia oraria');
+    }
+
+    public function test_admin_can_crud_dashboard_checklist_items(): void
+    {
+        $user = User::factory()->create();
+        $checklistDate = '2026-07-03';
+        $dashboardUrl = route('admin.dashboard', ['checklist_date' => $checklistDate]).'#checklist-banco';
+
+        $this->actingAs($user)
+            ->post(route('admin.checklist.store'), [
+                'title' => 'Verificare banco',
+                'checklist_date' => $checklistDate,
+            ])
+            ->assertRedirect($dashboardUrl);
+
+        $item = AdminChecklistItem::firstOrFail();
+
+        $this->actingAs($user)
+            ->get(route('admin.dashboard', ['checklist_date' => $checklistDate]))
+            ->assertOk()
+            ->assertSee('bi bi-pencil', false)
+            ->assertSee('data-checklist-save hidden', false)
+            ->assertSee('bi bi-trash', false)
+            ->assertSee('data-checklist-edit', false);
+
+        $this->actingAs($user)
+            ->patch(route('admin.checklist.update', $item), [
+                'title' => 'Verificare banco e vetrina',
+                'checklist_date' => $checklistDate,
+                'is_done' => '1',
+            ])
+            ->assertRedirect($dashboardUrl);
+
+        $this->assertDatabaseHas('admin_checklist_items', [
+            'id' => $item->id,
+            'title' => 'Verificare banco e vetrina',
+            'checklist_date' => $checklistDate,
+            'is_done' => true,
+        ]);
+
+        $this->actingAs($user)
+            ->delete(route('admin.checklist.destroy', $item))
+            ->assertRedirect($dashboardUrl);
+
+        $this->assertDatabaseMissing('admin_checklist_items', ['id' => $item->id]);
+    }
+
+    public function test_dashboard_checklists_are_isolated_by_selected_date(): void
+    {
+        $user = User::factory()->create();
+
+        AdminChecklistItem::create([
+            'title' => 'Checklist giugno',
+            'checklist_date' => '2026-06-29',
+            'position' => 1,
+        ]);
+        AdminChecklistItem::create([
+            'title' => 'Checklist luglio',
+            'checklist_date' => '2026-07-03',
+            'position' => 1,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.dashboard', ['checklist_date' => '2026-07-03']))
+            ->assertOk()
+            ->assertSee('Checklist luglio')
+            ->assertDontSee('Checklist giugno');
     }
 
     public function test_application_uses_italy_timezone(): void
@@ -335,12 +449,14 @@ class RyaBakeryFlowTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('admin.orders.accept', $order))
+            ->assertRedirect(route('admin.orders.index'))
             ->assertSessionHas('success');
 
         $this->assertSame(Order::STATUS_PENDING, $order->fresh()->status);
 
         $this->actingAs($user)
             ->patch(route('admin.orders.cancel', $order))
+            ->assertRedirect(route('admin.orders.index'))
             ->assertSessionHas('success');
 
         $this->assertSame(Order::STATUS_CANCELLED, $order->fresh()->status);
@@ -420,6 +536,47 @@ class RyaBakeryFlowTest extends TestCase
         $this->assertNotNull($order->histories()->first()->restored_at);
     }
 
+    public function test_order_history_displays_and_filters_by_real_order_status(): void
+    {
+        $user = User::factory()->create();
+        $cancelled = Order::create([
+            'slug' => 'ordine-annullato-storico',
+            'customer_name' => 'Cliente Annullato',
+            'table_number' => 3,
+            'status' => Order::STATUS_CANCELLED,
+            'total_price' => 4.40,
+            'cancelled_at' => now(),
+        ]);
+        $delivered = Order::create([
+            'slug' => 'ordine-completato-storico',
+            'customer_name' => 'Cliente Completato',
+            'table_number' => 4,
+            'status' => Order::STATUS_DELIVERED,
+            'total_price' => 8.20,
+            'delivered_at' => now(),
+        ]);
+
+        $cancelled->histories()->create([
+            'reason' => OrderHistory::REASON_CANCELLED,
+            'archived_at' => now(),
+            'restorable_until' => now()->addMinutes(30),
+        ]);
+        $delivered->histories()->create([
+            'reason' => OrderHistory::REASON_DELIVERED,
+            'archived_at' => now(),
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.order-history.index', ['status' => Order::STATUS_CANCELLED]))
+            ->assertOk()
+            ->assertSee('Stato ordine')
+            ->assertSee('Ordinato')
+            ->assertSee('Cliente Annullato')
+            ->assertSee('Annullato')
+            ->assertDontSee('Cliente Completato')
+            ->assertDontSee('Motivo');
+    }
+
     public function test_admin_can_complete_order_and_it_is_archived_immediately(): void
     {
         $user = User::factory()->create();
@@ -433,7 +590,7 @@ class RyaBakeryFlowTest extends TestCase
 
         $this->actingAs($user)
             ->patch(route('admin.orders.complete', $order))
-            ->assertRedirect(route('admin.order-history.index'))
+            ->assertRedirect(route('admin.orders.index'))
             ->assertSessionHas('success');
 
         $this->assertSame(Order::STATUS_DELIVERED, $order->fresh()->status);

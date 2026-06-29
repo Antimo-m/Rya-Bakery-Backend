@@ -1,7 +1,6 @@
 
 import '@fontsource/lora/latin-600.css';
 import '@fontsource/lora/latin-700.css';
-import 'iconify-icon';
 import Alpine from 'alpinejs';
 import echo from './lib/echo';
 
@@ -26,20 +25,26 @@ document.querySelectorAll('.admin-sidebar a').forEach((link) => {
     link.addEventListener('click', () => setAdminMenu(false));
 });
 
-function syncTableLabels(table) {
-    const headers = Array.from(table.querySelectorAll('thead th')).map((cell) => cell.textContent.trim());
+document.querySelectorAll('[data-checklist-row]').forEach((form) => {
+    const editButton = form.querySelector('[data-checklist-edit]');
+    const saveButton = form.querySelector('[data-checklist-save]');
+    const titleInput = form.querySelector('[data-checklist-title]');
+    const statusInput = form.querySelector('[data-checklist-status-input]');
 
-    table.querySelectorAll('tbody tr').forEach((row) => {
-        Array.from(row.children).forEach((cell, index) => {
-            if (headers[index]) {
-                cell.dataset.label = headers[index];
-            }
-        });
+    editButton?.addEventListener('click', () => {
+        titleInput?.removeAttribute('readonly');
+        titleInput?.focus();
+        titleInput?.select();
+        editButton.hidden = true;
+
+        if (saveButton) {
+            saveButton.hidden = false;
+        }
     });
-}
 
-document.querySelectorAll('.admin-table').forEach((table) => {
-    syncTableLabels(table);
+    statusInput?.addEventListener('change', () => {
+        form.requestSubmit();
+    });
 });
 
 const confirmDialog = document.querySelector('[data-confirm-dialog]');
@@ -48,29 +53,14 @@ const confirmSubmit = document.querySelector('[data-confirm-submit]');
 const confirmCancel = document.querySelector('[data-confirm-cancel]');
 let pendingForm = null;
 
-const expandedOrderProducts = (container) => (
-    Array.from(container.querySelectorAll('.admin-product-chip')).length
-);
+document.querySelectorAll('form').forEach((form) => {
+    form.addEventListener('submit', () => {
+        if (form.matches('[data-confirm]')) {
+            return;
+        }
 
-document.addEventListener('click', (event) => {
-    const toggle = event.target.closest('[data-order-products-toggle]');
-
-    if (!toggle) {
-        return;
-    }
-
-    const stack = toggle.closest('[data-order-products]');
-    const extra = stack?.querySelector('[data-order-products-extra]');
-    const label = toggle.querySelector('[data-toggle-label]');
-
-    if (!extra || !label) {
-        return;
-    }
-
-    const willOpen = extra.hidden;
-    extra.hidden = !willOpen;
-    toggle.setAttribute('aria-expanded', String(willOpen));
-    label.textContent = willOpen ? 'Mostra meno' : `+${expandedOrderProducts(extra)} altri prodotti`;
+        form.closest('.admin-panel, .admin-order-card, .history-order-card, .product-data-row')?.classList.add('is-loading');
+    });
 });
 
 document.addEventListener('submit', (event) => {
@@ -95,6 +85,7 @@ confirmSubmit?.addEventListener('click', () => {
     const form = pendingForm;
     pendingForm = null;
     confirmDialog.close();
+    form?.closest('.admin-panel, .admin-order-card, .history-order-card, .product-data-row')?.classList.add('is-loading');
     form?.submit();
 });
 
@@ -222,9 +213,8 @@ document.querySelectorAll('select[data-custom-select]').forEach((select) => {
 const realtimeOrders = document.querySelector('[data-realtime-orders]');
 
 if (realtimeOrders) {
-    const table = realtimeOrders.querySelector('.admin-table');
-    const tbody = realtimeOrders.querySelector('[data-orders-table-body]');
-    const emptyRow = realtimeOrders.querySelector('[data-orders-empty-row]');
+    const orderList = realtimeOrders.querySelector('[data-orders-list]');
+    const emptyState = realtimeOrders.querySelector('[data-orders-empty]');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const soundToggle = document.querySelector('[data-order-sound-toggle]');
     const soundLabel = soundToggle?.querySelector('[data-sound-label]');
@@ -260,19 +250,20 @@ if (realtimeOrders) {
                 <form method="POST" action="${acceptUrl}" data-confirm="Prendere questo ordine in preparazione?">
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
-                    <button class="admin-btn success admin-btn--icon" type="submit" aria-label="Accetta ordine" title="Accetta">
-                        <iconify-icon icon="solar:chef-hat-bold-duotone"></iconify-icon>
+                    <button class="admin-btn success" type="submit" title="Accetta">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        <span>Accetta</span>
                     </button>
                 </form>
                 <form method="POST" action="${cancelUrl}" data-confirm="Annullare o rifiutare questo ordine? Sara spostato nello storico.">
                     <input type="hidden" name="_token" value="${escapeHtml(csrfToken)}">
                     <input type="hidden" name="_method" value="PATCH">
                     <button class="admin-btn danger admin-btn--icon" type="submit" aria-label="Annulla ordine" title="Annulla">
-                        <iconify-icon icon="solar:close-square-bold-duotone"></iconify-icon>
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
                     </button>
                 </form>
                 <a class="admin-btn edit admin-btn--icon" href="${editUrl}" aria-label="Modifica ordine" title="Modifica">
-                    <iconify-icon icon="solar:pen-2-bold-duotone"></iconify-icon>
+                    <i class="bi bi-pencil" aria-hidden="true"></i>
                 </a>
             </div>
         `;
@@ -286,7 +277,8 @@ if (realtimeOrders) {
         soundToggle.setAttribute('aria-pressed', String(soundEnabled));
         soundToggle.classList.toggle('is-on', soundEnabled);
         soundLabel.textContent = soundEnabled ? 'Audio attivo' : 'Audio spento';
-        soundIcon.setAttribute('icon', soundEnabled ? 'solar:bell-bing-bold-duotone' : 'solar:bell-off-linear');
+        soundIcon.classList.toggle('bi-bell-fill', soundEnabled);
+        soundIcon.classList.toggle('bi-bell-slash', !soundEnabled);
     };
 
     const playOrderChime = () => {
@@ -337,72 +329,63 @@ if (realtimeOrders) {
 
     syncSoundToggle();
 
-    const productChip = (item) => `
-        <span class="admin-product-chip">
+    const productItem = (item) => `
+        <li>
             <img src="${escapeHtml(item.product?.image_url || '')}" alt="">
-            <span>${escapeHtml(item.quantity)}x ${escapeHtml(item.product?.name || 'Prodotto')}</span>
-        </span>
+            <span>
+                <strong>${escapeHtml(item.quantity)}× ${escapeHtml(item.product?.name || 'Prodotto')}</strong>
+                <small>${euroFormatter.format(Number(item.line_total || 0))}</small>
+            </span>
+        </li>
     `;
 
     const orderProducts = (order) => {
         const items = order.items || [];
 
-        if (items.length <= 4) {
-            return `
-                <div class="admin-product-stack" data-order-products>
-                    ${items.map(productChip).join('')}
-                </div>
-            `;
-        }
-
         return `
-            <div class="admin-product-stack" data-order-products>
-                ${productChip(items[0])}
-                <div class="admin-product-stack__extra" data-order-products-extra hidden>
-                    ${items.slice(1).map(productChip).join('')}
-                </div>
-                <button class="admin-products-toggle" type="button" data-order-products-toggle aria-expanded="false">
-                    <iconify-icon icon="solar:menu-dots-bold"></iconify-icon>
-                    <span data-toggle-label>+${items.length - 1} altri prodotti</span>
-                </button>
-            </div>
+            <ul class="admin-order-items">
+                ${items.map(productItem).join('')}
+            </ul>
         `;
     };
 
-    const orderRow = (order) => {
-        const row = document.createElement('tr');
-        row.dataset.orderId = order.id;
-        row.className = 'is-live-new';
-        row.innerHTML = `
-            <td>
-                <strong>${escapeHtml(order.customer_name)}</strong>
-            </td>
-            <td><small>${escapeHtml(order.slug)}</small></td>
-            <td>${escapeHtml(order.table_number)}</td>
-            <td>${orderProducts(order)}</td>
-            <td><span class="badge ${escapeHtml(order.status)}">${escapeHtml(order.status_label || order.status)}</span></td>
-            <td>${euroFormatter.format(Number(order.total_price || 0))}</td>
-            <td>${order.created_at ? dateFormatter.format(new Date(order.created_at)) : ''}</td>
-            <td>${orderActions(order)}</td>
+    const orderCard = (order) => {
+        const card = document.createElement('article');
+        card.dataset.orderId = order.id;
+        card.className = 'admin-order-card is-live-new';
+        card.innerHTML = `
+            <header class="admin-order-card__header">
+                <div>
+                    <span class="badge ${escapeHtml(order.status)}">${escapeHtml(order.status_label || order.status)}</span>
+                    <h2>${escapeHtml(order.customer_name)}</h2>
+                    <small>${escapeHtml(order.slug)}</small>
+                </div>
+                <strong>${euroFormatter.format(Number(order.total_price || 0))}</strong>
+            </header>
+            <div class="admin-order-card__meta">
+                <span><i class="bi bi-hash" aria-hidden="true"></i> Tavolo ${escapeHtml(order.table_number)} · riferimento cliente</span>
+                <time><i class="bi bi-clock" aria-hidden="true"></i> ${order.created_at ? dateFormatter.format(new Date(order.created_at)) : ''}</time>
+            </div>
+            ${orderProducts(order)}
+            <footer class="admin-order-card__footer">
+                <span class="admin-order-card__pickup"><i class="bi bi-bag-check" aria-hidden="true"></i> Preparare per il ritiro al banco</span>
+                ${orderActions(order)}
+            </footer>
         `;
 
-        return row;
+        return card;
     };
 
     const prependOrder = (order) => {
-        if (!order || !tbody || tbody.querySelector(`[data-order-id="${order.id}"]`)) {
+        if (!order || !orderList || orderList.querySelector(`[data-order-id="${order.id}"]`)) {
             return false;
         }
 
-        emptyRow?.remove();
-        const row = orderRow(order);
-        tbody.prepend(row);
+        emptyState?.remove();
+        const card = orderCard(order);
+        orderList.prepend(card);
 
-        if (table) {
-            syncTableLabels(table);
-        }
-
-        window.setTimeout(() => row.classList.remove('is-live-new'), 5000);
+        window.setTimeout(() => card.classList.remove('is-live-new'), 5000);
 
         return true;
     };
@@ -424,7 +407,7 @@ if (realtimeOrders) {
 
             const data = await response.json();
             const missingOrders = (data.orders || []).filter((order) => (
-                !tbody?.querySelector(`[data-order-id="${order.id}"]`)
+                !orderList?.querySelector(`[data-order-id="${order.id}"]`)
             ));
 
             missingOrders.reverse().forEach((order) => prependOrder(order));
@@ -514,9 +497,9 @@ document.querySelectorAll('.custom-date-field input').forEach((input) => {
 
         panel.innerHTML = `
             <div class="custom-datepicker__header">
-                <button type="button" data-month="-1" aria-label="Mese precedente"><iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon></button>
+                <button type="button" data-month="-1" aria-label="Mese precedente"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
                 <strong>${monthFormatter.format(viewDate)}</strong>
-                <button type="button" data-month="1" aria-label="Mese successivo"><iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon></button>
+                <button type="button" data-month="1" aria-label="Mese successivo"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
             </div>
             <div class="custom-datepicker__weekdays">${weekDays.map((day) => `<span>${day}</span>`).join('')}</div>
             <div class="custom-datepicker__grid">${cells.join('')}</div>
@@ -534,6 +517,10 @@ document.querySelectorAll('.custom-date-field input').forEach((input) => {
                 input.value = control.dataset.date;
                 input.dispatchEvent(new Event('change', { bubbles: true }));
                 close();
+
+                if (input.hasAttribute('data-submit-on-select')) {
+                    input.form?.requestSubmit();
+                }
             });
         });
     };
