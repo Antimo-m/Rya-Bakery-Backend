@@ -41,7 +41,7 @@
                 <label for="image">Immagine</label>
                 <label class="upload-zone" data-upload-zone for="image">
                     <input id="image" name="image" type="file" accept="image/png,image/jpeg,image/webp">
-                    <span class="upload-zone__icon"><iconify-icon icon="solar:gallery-add-bold-duotone"></iconify-icon></span>
+                    <span class="upload-zone__icon"><i class="bi bi-image" aria-hidden="true"></i></span>
                     <span class="upload-zone__copy">
                         <strong>Trascina una foto o tocca per scegliere</strong>
                         <small data-upload-file-name>PNG, JPG o WebP fino a 2 MB</small>

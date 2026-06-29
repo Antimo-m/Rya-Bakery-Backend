@@ -250,9 +250,9 @@
     box-shadow: var(--rya-shadow-soft);
 }
 
-.native-select-hidden {
+.admin-body .native-select-hidden {
     position: absolute;
-    width: 1px !important;
+    width: 1px;
     height: 1px;
     opacity: 0;
     pointer-events: none;
@@ -404,7 +404,7 @@
     background: #fff;
     cursor: pointer;
 
-    iconify-icon {
+    .bi {
         justify-self: center;
         color: var(--rya-accent);
         font-size: 17px;

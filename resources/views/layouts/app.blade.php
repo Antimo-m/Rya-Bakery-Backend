@@ -23,7 +23,7 @@
                     <span>Rya Bakery & Café</span>
                 </a>
                 <button class="admin-menu-toggle" type="button" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Apri menu" title="Apri menu" data-admin-menu-toggle>
-                    <iconify-icon icon="solar:hamburger-menu-linear"></iconify-icon>
+                    <i class="bi bi-list" aria-hidden="true"></i>
                 </button>
             </header>
             <button class="admin-sidebar-backdrop" type="button" aria-label="Chiudi menu" data-admin-menu-close></button>
@@ -39,11 +39,11 @@
                 </a>
 
                 <nav class="admin-nav" aria-label="Navigazione admin">
-                    <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon> Dashboard</a>
-                    <a class="{{ request()->routeIs('admin.analysis.*') ? 'active' : '' }}" href="{{ route('admin.analysis.index') }}"><iconify-icon icon="solar:graph-new-up-bold-duotone"></iconify-icon> Analisi</a>
-                    <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><iconify-icon icon="solar:donut-bitten-bold-duotone"></iconify-icon> Prodotti</a>
-                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon> Ordini in arrivo</a>
-                    <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><iconify-icon icon="solar:archive-bold-duotone"></iconify-icon> Storico ordini</a>
+                    <a class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard</a>
+                    <a class="{{ request()->routeIs('admin.analysis.*') ? 'active' : '' }}" href="{{ route('admin.analysis.index') }}"><i class="bi bi-bar-chart" aria-hidden="true"></i> Analisi</a>
+                    <a class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><i class="bi bi-box-seam" aria-hidden="true"></i> Prodotti</a>
+                    <a class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><i class="bi bi-receipt" aria-hidden="true"></i> Ordini in arrivo</a>
+                    <a class="{{ request()->routeIs('admin.order-history.*') ? 'active' : '' }}" href="{{ route('admin.order-history.index') }}"><i class="bi bi-clock-history" aria-hidden="true"></i> Storico ordini</a>
                 </nav>
 
                 <div class="admin-user">
@@ -90,11 +90,11 @@
                 <p data-confirm-message>Vuoi continuare?</p>
                 <div class="confirm-dialog__actions">
                     <button class="admin-btn secondary" type="button" data-confirm-cancel>
-                        <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+                        <i class="bi bi-x-circle" aria-hidden="true"></i>
                         Annulla
                     </button>
                     <button class="admin-btn success" type="button" data-confirm-submit>
-                        <iconify-icon icon="solar:clipboard-check-bold-duotone"></iconify-icon>
+                        <i class="bi bi-check-circle" aria-hidden="true"></i>
                         Conferma
                     </button>
                 </div>

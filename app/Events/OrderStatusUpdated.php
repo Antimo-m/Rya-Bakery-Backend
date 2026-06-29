@@ -46,6 +46,7 @@ class OrderStatusUpdated implements ShouldBroadcastNow
                 'table_number' => $this->order->table_number,
                 'status' => $this->order->status,
                 'status_label' => $this->order->statusLabel(),
+                'pickup_message' => $this->order->pickupMessage(),
                 'total_price' => (float) $this->order->total_price,
                 'created_at' => $this->order->created_at?->toIso8601String(),
                 'items' => $this->order->items->map(fn ($item): array => [

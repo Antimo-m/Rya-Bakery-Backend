@@ -28,7 +28,7 @@ class Order extends Model
         self::STATUS_RECEIVED => 'Ricevuto',
         self::STATUS_PENDING => 'In preparazione',
         self::STATUS_CANCELLED => 'Annullato',
-        self::STATUS_DELIVERED => 'Pronto / Completato',
+        self::STATUS_DELIVERED => 'Pronto per il ritiro',
     ];
 
     protected function casts(): array
@@ -83,6 +83,13 @@ class Order extends Model
     public function statusLabel(): string
     {
         return self::STATUSES[$this->status] ?? $this->status;
+    }
+
+    public function pickupMessage(): ?string
+    {
+        return $this->status === self::STATUS_DELIVERED
+            ? 'Il tuo ordine è pronto. Vieni a ritirarlo al banco. Grazie per averci scelto.'
+            : null;
     }
 
     public static function archiveDeliveredOrders(): void
